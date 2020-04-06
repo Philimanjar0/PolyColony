@@ -1,7 +1,7 @@
 # Blender MTL File: 'farm.blend'
-# Material Count: 7
+# Material Count: 8
 
-newmtl Material.001
+newmtl BaseMat
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -11,7 +11,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material.002
+newmtl FieldMat
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -21,7 +21,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material.003
+newmtl Housemat
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -31,7 +31,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material.004
+newmtl RoofMat
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -41,7 +41,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material.005
+newmtl Stable
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -51,7 +51,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material.006
+newmtl StandMat
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -61,7 +61,17 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material.007
+newmtl Wheat1Mat
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Wheat3Mat
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
