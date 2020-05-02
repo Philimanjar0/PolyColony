@@ -1,0 +1,23 @@
+--water boarder for standard size
+--grid positions (x,z) begin at TL corner and move CW
+--in TTS, y is perpendicular to table, z is forward back, x left right
+boarder_small = {
+    {-5.97,10.35},
+    {-1.99,10.35},
+    {1.99,10.35},
+    {5.97,10.35},
+    {7.96,6.9},
+    {9.95,3.45},
+    {11.94,0},
+    {9.95,-3.45},
+    {7.96,-6.9},
+    {5.97,-10.35},
+    {1.99,-10.35},
+    {-1.99,-10.35},
+    {-5.97,-10.35},
+    {-7.96,-6.9},
+    {-9.95,-3.45},
+    {-11.94,0},
+    {-9.95,3.45},
+    {-7.97,6.9}
+}
