@@ -1,4 +1,5 @@
-print('snaps import')
+-- snap point locations and rotations for roads
+-- one for each edge of each tile, aligned to face the direction of edge
 tileSnap = {
     {
         position = {2,0.1,0},
@@ -29,8 +30,44 @@ tileSnap = {
         position = {1,0.1,-1.725},
         rotation = {0,-300,0},
         rotation_snap = true
+    },
+    -- snap point locations and rotations for intersections
+    -- one for each corner, aligned with edges
+    {
+        position = {2,0.1,1.15},
+        rotation = {0,120,0},
+        rotation_snap = true
+    },
+    {
+        position = {-2,0.1,1.15},
+        rotation = {0,0,0},
+        rotation_snap = true
+    },
+    {
+        position = {-2,0.1,-1.15},
+        rotation = {0,-60,0},
+        rotation_snap = true
+    },
+    {
+        position = {2,0.1,-1.15},
+        rotation = {0,180,0},
+        rotation_snap = true
+    },
+    {
+        position = {0,0.1,2.3},
+        rotation = {0,60,0},
+        rotation_snap = true
+    },
+    {
+        position = {0,0.1,-2.3},
+        rotation = {0,-120,0},
+        rotation_snap = true
     }
 }
+
+-- snap points for each tiles number podium
+-- each tile has a unique location for podium
+-- snap points are at center of each podium for number tile
 
 desertSnap = {{position = {0.876,0.38,0.439}}}
 
@@ -43,3 +80,6 @@ sheepSnap = {{position = {0.851, 0.583, -0.767}}}
 mountainSnap = {{position = {-0.746, 0.383, -0.616}}}
 
 treesSnap = {{position = {-0.973, 0.329, 0.482}}}
+
+
+print('snap points imported')

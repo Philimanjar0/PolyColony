@@ -72,3 +72,6 @@ sheep.convex = false
 sheep.specular_intensity = 0.2
 sheep.specular_sharpness = 4.0
 sheep.fresnel_strength = 0.5
+
+
+print('tile models and parameters imported')
