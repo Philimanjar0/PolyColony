@@ -1,0 +1,45 @@
+print('snaps import')
+tileSnap = {
+    {
+        position = {2,0.1,0},
+        rotation = {0,0,0},
+        rotation_snap = true
+    },
+    {
+        position = {-2,0.1,0},
+        rotation = {0,180,0},
+        rotation_snap = true
+    },
+    {
+        position = {1,0.1,1.725},
+        rotation = {0,-60,0},
+        rotation_snap = true
+    },
+    {
+        position = {-1,0.1,1.725},
+        rotation = {0,-120,0},
+        rotation_snap = true
+    },
+    {
+        position = {-1,0.1,-1.725},
+        rotation = {0,-240,0},
+        rotation_snap = true
+    },
+    {
+        position = {1,0.1,-1.725},
+        rotation = {0,-300,0},
+        rotation_snap = true
+    }
+}
+
+desertSnap = {{position = {0.876,0.38,0.439}}}
+
+wheatSnap = {{position = {0.778,0.218,0.887}}}
+
+claySnap = {{position = {-0.235,0.476,1.262}}}
+
+sheepSnap = {{position = {0.851, 0.583, -0.767}}}
+
+mountainSnap = {{position = {-0.746, 0.383, -0.616}}}
+
+treesSnap = {{position = {-0.973, 0.329, 0.482}}}
