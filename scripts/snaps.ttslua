@@ -77,7 +77,7 @@ claySnap = {{position = {-0.235,0.476,1.262}}}
 
 sheepSnap = {{position = {0.851, 0.583, -0.767}}}
 
-mountainSnap = {{position = {-0.746, 0.383, -0.616}}}
+oreSnap = {{position = {-0.746, 0.383, -0.616}}}
 
 treesSnap = {{position = {-0.973, 0.329, 0.482}}}
 

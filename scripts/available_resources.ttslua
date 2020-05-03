@@ -1,0 +1,41 @@
+WOOD = 0
+CLAY = 1
+SHEEP = 2
+WHEAT = 3
+ORE = 4
+DESERT = 5
+
+resources_small = {
+    WOOD,
+    WOOD,
+    WOOD,
+    WOOD,
+    CLAY,
+    CLAY,
+    CLAY,
+    ORE,
+    ORE,
+    ORE,
+    WHEAT,
+    WHEAT,
+    WHEAT,
+    WHEAT,
+    SHEEP,
+    SHEEP,
+    SHEEP,
+    SHEEP,
+    DESERT
+}
+
+small_probabilities = {
+    2,
+    3, 3,
+    4, 4,
+    5, 5,
+    6, 6,
+    8, 8,
+    9, 9,
+    10, 10,
+    11, 11,
+    12
+}
