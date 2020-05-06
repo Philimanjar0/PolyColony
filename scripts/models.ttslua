@@ -2,6 +2,9 @@ tileParams = {}
 tileParams.type = 'Custom_Model'
 tileParams.sound = false
 
+deckParams = {}
+deckParams.type = 'DeckCustom'
+deckParams.sound = false
 
 desert = {}
 desert.mesh = "E:/Complete_Catan/out/desert/desert.obj"
@@ -73,5 +76,11 @@ sheep.specular_intensity = 0.2
 sheep.specular_sharpness = 4.0
 sheep.fresnel_strength = 0.5
 
+resourceDeck = {}
+resourceDeck.face = "E:/Complete_Catan/decks/resources.png"
+resourceDeck.back = "E:/Complete_Catan/decks/back.jpg"
+resourceDeck.width = 3
+resourceDeck.height = 2
+resourceDeck.number = 5
 
-print('tile models and parameters imported')
+print('assets and parameters imported')
