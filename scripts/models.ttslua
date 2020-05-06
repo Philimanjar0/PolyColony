@@ -6,6 +6,10 @@ deckParams = {}
 deckParams.type = 'DeckCustom'
 deckParams.sound = false
 
+probabilityParams = {}
+probabilityParams.type = 'Custom_Tile'
+probabilityParams.sound = false
+
 desert = {}
 desert.mesh = "E:/Complete_Catan/out/desert/desert.obj"
 desert.diffuse = "E:/Complete_Catan/out/desert/DesertMat.png"
@@ -82,5 +86,24 @@ resourceDeck.back = "E:/Complete_Catan/decks/back.jpg"
 resourceDeck.width = 3
 resourceDeck.height = 2
 resourceDeck.number = 5
+
+probabilityCustom = {}
+probabilityCustom.image = "E:/Complete_Catan/out/probCoins/two.png"
+probabilityCustom.type = 2
+probabilityCustom.thickness = 0.1
+probabilityCustom.stackable = true
+
+probabilityImages = {
+"E:/Complete_Catan/out/probCoins/two.png",
+"E:/Complete_Catan/out/probCoins/three.png",
+"E:/Complete_Catan/out/probCoins/four.png",
+"E:/Complete_Catan/out/probCoins/five.png",
+"E:/Complete_Catan/out/probCoins/six.png",
+"E:/Complete_Catan/out/probCoins/eight.png",
+"E:/Complete_Catan/out/probCoins/nine.png",
+"E:/Complete_Catan/out/probCoins/ten.png",
+"E:/Complete_Catan/out/probCoins/eleven.png",
+"E:/Complete_Catan/out/probCoins/twelve.png"}
+
 
 print('assets and parameters imported')
