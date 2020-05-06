@@ -27,7 +27,7 @@ resources_small = {
     DESERT
 }
 
-small_probabilities = {
+probabilities_small = {
     2,
     3, 3,
     4, 4,
