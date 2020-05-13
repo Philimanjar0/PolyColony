@@ -81,5 +81,8 @@ oreSnap = {{position = {-0.746, 0.383, -0.616}}}
 
 treesSnap = {{position = {-0.973, 0.329, 0.482}}} --adjusted y value to fix strange collision, original 0.329
 
+portSnap = {}
+portSnap.position = {-0.493, 0.36, 0.927}
+portSnap.rotation = {0,30,0}
 
 print('snap points imported')
