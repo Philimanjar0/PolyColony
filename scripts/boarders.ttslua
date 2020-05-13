@@ -21,3 +21,18 @@ boarder_small = {
     {-9.95,3.45},
     {-7.97,6.9}
 }
+
+--locations for the trade ships for standard size
+--formatted (x,z,r_z) begin at TL corner and move CW
+--in TTS, y is perpendicular to table, z is forward back, x left right
+trade_small = {
+    {-5.97,10.35,0},
+    {1.99,10.35,60},
+    {7.96,6.9,60},
+    {11.94,0,120},
+    {7.96,-6.9,180},
+    {1.99,-10.35,180},
+    {-5.97,-10.35,240},
+    {-9.95,-3.45,240},
+    {-9.95,3.45,300}
+}
