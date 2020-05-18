@@ -6,6 +6,13 @@
 #include Complete_Catan/scripts/available_resources
 
 probabilityPositions = {}
+resProbDistribution = {} -- getBalancedProbs
+probabilityList = {} --buildSortedProbs
+resourceList = {} --get balanced board
+placedResourceObjects = {} --place terrain
+placedProbabilityObjects = {} --place probs
+tilePositions = {}
+
 
 numWood = 4
 numClay = 3
@@ -14,6 +21,8 @@ numWheat = 4
 numOre = 3
 numDesert = 1
 
+totalResources = 18
+totalReturn = 58
 ----------------------------------------- AUTOMATIC FUNCTIONS ------------------------------------------------------
 function onSave()
     --local data_to_save = {}
@@ -23,7 +32,10 @@ function onSave()
 end
 
 function onLoad(saved_data)
-    log(dump(duplicateProbs{1,2,2}))
+    tilePositions = deepcopy(land_small)
+    a = {1}
+    b = 2
+    print(dump(table.insert(a,b)))
 end
 
 function onUpdate()
@@ -32,16 +44,26 @@ end
 
 --------------------------------------- DEFINED FUNCTIONS ---------------------------------------------------------
 
+function test(param)
+
+end
+
+-- buildProbList(returnList, resourceList, probByResource)
 --main functin called from UI to call other generation functions
 function generate(_,_,idValue)
-    placeBoarder(idValue)
-    placeTerrain(getBalancedBoard(), land_small)
-    --placeRandomProbs()
-    --probabilityPositions = {}
-    --resourceCards({-12.5,1,-7.5}, {0,60,0}, 19)
+    resourceList = getBalancedBoard()
+    local tick = 0
+    resProbDistribution = getBalancedProbs(probabilities_small)
+    probabilityList = buildProbList({}, resourceList, resProbDistribution)
+    log('resource list')
+    log(dump(resourceList))
+    log('prob distribution')
+    log(dump(resProbDistribution))
+    log('prob list')
+    log(dump(probabilityList))
 
-    --laceTradeTokens(1,placePorts(1))
-
+    placedResourceObjects = placeTerrain(resourceList,land_small)
+    placedProbabilityObjects = placeProbs(probabilityList, placedResourceObjects, resourceList)
 end
 
 --places water boarder given board size
@@ -107,42 +129,49 @@ function placeTerrain(board, coords)
         placementArray[index] = spawnObject(tileParams)
         if resource == SHEEP then
             placementArray[index].setCustomObject(sheep)
-            tempSnapPoint = sheepSnap[1].position
-            placementArray[index].setSnapPoints(concat(tileSnap,sheepSnap))
+            placementArray[index].setName('sheep')
+            --tempSnapPoint = sheepSnap[1].position
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[3]))
         elseif resource == WOOD then
             placementArray[index].setCustomObject(wood)
-            tempSnapPoint = treesSnap[1].position
-            placementArray[index].setSnapPoints(concat(tileSnap,treesSnap))
+            placementArray[index].setName('wood')
+            --tempSnapPoint = treesSnap[1].position
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[1]))
         elseif resource == CLAY then
             placementArray[index].setCustomObject(clay)
-            tempSnapPoint = claySnap[1].position
-            placementArray[index].setSnapPoints(concat(tileSnap,claySnap))
+            placementArray[index].setName('brick')
+            --tempSnapPoint = claySnap[1].position
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[2]))
         elseif resource == DESERT then
             placementArray[index].setCustomObject(desert)
-            tempSnapPoint = nil
-            placementArray[index].setSnapPoints(concat(tileSnap,desertSnap))
+            placementArray[index].setName('desert')
+            --tempSnapPoint = nil
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[6]))
         elseif resource == WHEAT then
             placementArray[index].setCustomObject(wheat)
-            tempSnapPoint = wheatSnap[1].position
-            placementArray[index].setSnapPoints(concat(tileSnap,wheatSnap))
+            placementArray[index].setName('wheat')
+            --tempSnapPoint = wheatSnap[1].position
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[4]))
         elseif resource == ORE then
             placementArray[index].setCustomObject(ore)
-            tempSnapPoint = oreSnap[1].position
-            placementArray[index].setSnapPoints(concat(tileSnap,oreSnap))
+            placementArray[index].setName('ore')
+            --tempSnapPoint = oreSnap[1].position
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[5]))
         else
             print('NO MODEL FOUND...')
-            tempSnapPoint = nil
+            --tempSnapPoint = nil
         end
         placementArray[index].setPosition({coords[index][1],0.96,coords[index][2]})
         placementArray[index].setRotation({0,60*math.random(6),0})
         placementArray[index].setLock(true)
-        if tempSnapPoint != nil then
-            table.insert(probabilityPositions, placementArray[index].positionToWorld(tempSnapPoint))
-        else
-            print('no snap point found')
-        end
+        -- if tempSnapPoint != nil then
+        --     table.insert(probabilityPositions, placementArray[index].positionToWorld(tempSnapPoint))
+        -- else
+        --     print('no snap point found')
+        -- end
 
     end
+    return placementArray
 end
 
 --returns a random board where no two of the same resource are adjacent
@@ -197,59 +226,211 @@ function getRandomBoard(size)
     end
     return returnSet
 end
+--------------------------------------------------start working here.... recursion is needed...
+-- function buildSortedProbs(terrainList, probsByResource, probabilityList)
+--     local returnSet = {}
+--     local availProbs = deepcopy(probsByResource)
+--     local layout = land_small
+--     for i,resource in pairs(terrainList) do --each terrain
+--         local canPlace = true
+--         if(resource ~= 5) then
+--             --log(resource)
+--             for j,num in pairs(availProbs[resource+1]) do --each avail prob
+--                 for k, placedProbIndex in pairs(getNeighbors(layout, i)) do
+--                     print('checking if neighbor ', returnSet[placedProbIndex], ' at ', placedProbIndex, ' = prob ', num)
+--                     if floatEqual(returnSet[placedProbIndex],num,1) then
+--                         --print('yes')
+--                         canPlace = false
+--                         break
+--                     end
+--                 end
+--                 if canPlace then
+--                     print('no, inserting ', num, ' at ', i)
+--                     table.insert(returnSet,table.remove(availProbs[resource+1],j))
+--                     break
+--                 end
+--             end
+--             if not canPlace then
+--                 print('---------------------fail')
+--                 return {-1}
+--             end
+--         else
+--             table.insert(returnSet,0)
+--         end
+--     end
+--     return returnSet
+-- end
+
+function buildProbList(returnList, resourceList, probByResource)
+    local returnList = deepcopy(returnList)
+    local resourceList = deepcopy(resourceList)
+    local probByResource = deepcopy(probByResource)
+    if #resourceList == 0 then
+        return returnList
+    end
+    --log(resourceList[1])
+    local selectedResource = table.remove(resourceList,1)
+    for i,probToTest in pairs(probByResource[selectedResource+1]) do
+        if canPlace(returnList, probToTest) then
+            table.remove(probByResource[selectedResource+1],i)
+            local theRest = buildProbList(table.insert(returnList, probToTest),resourceList,probByResource)
+            if theRest ~= nil then
+                --log(probToTest)
+                return theRest
+            end
+        end
+    end
+    return nil
+end
+
+function canPlace(currentBoard, num)
+    local canPlace = true
+    for i, placedProbIndex in pairs(getNeighbors(tilePositions, #currentBoard+1)) do
+        if floatEqual(currentBoard[placedProbIndex],num,1) then
+            canPlace = false
+            break
+        end
+        if probability_map[num] == 5 then
+            if floatEqual(probability_map[currentBoard[placedProbIndex]],5,1) then
+                canPlace = false
+            end
+        end
+    end
+    return canPlace
+end
+
+
+
 
 function getBalancedProbs(probArray)
-    local availProbs = deepcopy(probArray)
-    local pipsPerResource = 11.8 --will need to calculate this later
+    local averageReturnFloor = 3
+    local averageReturnCeiling = 3.5
     local woodProbs = {}
     local clayProbs = {}
     local sheepProbs = {}
     local wheatProbs = {}
     local oreProbs = {}
 
-    local validDist = false
-    while validDist do
-        --randomly place probs
+    function localProb()
+        local availProbs = deepcopy(probArray)
+        woodProbs = {}
+        clayProbs = {}
+        sheepProbs = {}
+        wheatProbs = {}
+        oreProbs = {}
+        local tempSum = 0
         for i = 1,numWood do
-            table.insert(woodProbs, table.remove(availProbs,math.random(#availProbs)))
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(woodProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numWood) then
+                return false
+            end
         end
-        for i = 1,clayProbs do
-            table.insert(woodProbs, table.remove(availProbs,math.random(#availProbs)))
+        if tempSum < averageReturnFloor*numWood then
+            return false
         end
-        for i = 1,sheepProbs do
-            table.insert(woodProbs, table.remove(availProbs,math.random(#availProbs)))
-        end
-        for i = 1,wheatProbs do
-        table.insert(woodProbs, table.remove(availProbs,math.random(#availProbs)))
-        end
-        for i = 1,oreProbs do
-            table.insert(woodProbs, table.remove(availProbs,math.random(#availProbs)))
-        end
-        validDist = duplicateProbs(woodProbs) and duplicateProbs(clayProbs) and
-        duplicateProbs(wheatProbs) and duplicateProbs(sheepProbs) and duplicateProbs(oreProbs) and
+        tempSum = 0
 
-        
+        for i = 1,numClay do
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(clayProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numClay) then
+                return false
+            end
+        end
+        if tempSum < averageReturnFloor*numClay then
+            return false
+        end
+        tempSum = 0
 
+        for i = 1,numSheep do
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(sheepProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numSheep) then
+                return false
+            end
+        end
+        if tempSum < averageReturnFloor*numSheep then
+            return false
+        end
+        tempSum = 0
+
+        for i = 1,numWheat do
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(wheatProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numWheat) then
+                return false
+            end
+        end
+        if tempSum < averageReturnFloor*numWheat then
+            return false
+        end
+        tempSum = 0
+
+        for i = 1,numOre do
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(oreProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numOre) then
+                return false
+            end
+        end
+        if tempSum < averageReturnFloor*numOre then
+            return false
+        end
+        return not duplicateProbs(deepcopy({woodProbs,clayProbs,sheepProbs,wheatProbs,oreProbs,}))
+    end
+
+    local tick = 0
+    while not localProb()  do
+        tick = tick + 1
+    end
+
+    if tick < 500 then
+        return{woodProbs,clayProbs,sheepProbs,wheatProbs,oreProbs,{0}}
+    else
+        print('balancing prob per resource timed out....')
+        return{}
     end
 end
 
 --randomly distribute probabilities to board
 --uses probabilityCustom built by generate terrain
-function placeRandomProbs()
-    local probArray = deepcopy(probabilities_small)
-    local probCustParams = deepcopy(probabilityCustom)
-    local placementArray = {}
-    for index,pos in pairs(probabilityPositions) do
-        local toRemove = math.random(#probArray)
-        local selected = table.remove(probArray, toRemove)
-        placementArray[index] = spawnObject(probabilityParams)
-        probCustParams.image = probabilityImages[selected-1-math.floor(selected/7)]
-        placementArray[index].setCustomObject(probCustParams)
-        placementArray[index].scale(0.5)
-        placementArray[index].setPosition(probabilityPositions[index])
-        placementArray[index].setRotation({0,180,0})
-        placementArray[index].setLock(true)
+function generateRandomProbs(availableProbs)
+    local availProbs = deepcopy(availableProbs)
+    local returnArray = {}
+    for index,pos in pairs(availableProbs) do
+        table.insert(returnArray,table.remove(availProbs,math.random(#availProbs)))
     end
+    return returnArray
+end
+
+function placeProbs(probList, placedResources, resourceList)
+    if(probList==nil) then
+        return {}
+    end
+    local placementArray = {}
+    local probCustParams = deepcopy(probabilityCustom)
+    local availProbs = deepcopy(probList)
+    for i,tile in pairs(placedResources) do
+        if(tile.getName() ~= 'desert') then
+            local selectedProb = table.remove(availProbs,1)
+            placementArray[i] = spawnObject(probabilityParams)
+            probCustParams.image = probabilityImages[selectedProb-1-math.floor(selectedProb/7)]
+            placementArray[i].setCustomObject(probCustParams)
+            placementArray[i].scale(0.5)
+            placementArray[i].setPosition(tile.positionToWorld(resource_spec_snaps[resourceList[i]+1][1].position))
+            placementArray[i].setRotation({0,180,0})
+            placementArray[i].setLock(true)
+        else
+            table.remove(availProbs,1)
+        end
+    end
+    return placementArray
 end
 
 
@@ -400,14 +581,26 @@ function addArray(array1, array2)
     return returnArray
 end
 
+function arraySum(array)
+    local returnVal = 0
+    for _,num in pairs(array) do
+        returnVal = returnVal + num
+    end
+    return returnVal
+end
+
 function duplicateProbs(probTable)
     if #probTable == 0 then
         return false
     end
     local cur = table.remove(probTable)
-    for _,num in pairs(probTable) do
-        if cur == num then
-            return true
+    if type(cur) == 'table' then
+        return duplicateProbs(cur) or duplicateProbs(probTable)
+    else
+        for _,num in pairs(probTable) do
+            if cur == num then
+                return true
+            end
         end
     end
     return false or duplicateProbs(probTable)
