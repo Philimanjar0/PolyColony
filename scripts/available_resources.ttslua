@@ -1,3 +1,4 @@
+--constants used by placement routines.
 WOOD = 0
 CLAY = 1
 SHEEP = 2
@@ -38,4 +39,28 @@ probabilities_small = {
     10, 10,
     11, 11,
     12
+}
+
+probability_map = {
+    0, --1, cant roll
+    1, --2
+    2, --3
+    3, --4
+    4, --5
+    5, --6
+    6, --7
+    5, --8
+    4, --9
+    3, --10
+    2, --11
+    1, --12
+}
+
+avail_trade_small = {
+    WOOD,
+    CLAY,
+    SHEEP,
+    WHEAT,
+    ORE,
+    DESERT, DESERT, DESERT --desert is used as the 3:1 port
 }
