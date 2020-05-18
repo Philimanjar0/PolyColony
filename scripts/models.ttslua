@@ -120,12 +120,12 @@ tradeCustom.type = 3
 tradeCustom.thickness = 0.1
 
 tradeTokenImages = {
-    "E:/Complete_Catan/out/tradeTokens/threeToOne.png",
+    "E:/Complete_Catan/out/tradeTokens/twoWood.png",
     "E:/Complete_Catan/out/tradeTokens/twoBrick.png",
-    "E:/Complete_Catan/out/tradeTokens/twoOre.png",
     "E:/Complete_Catan/out/tradeTokens/twoSheep.png",
     "E:/Complete_Catan/out/tradeTokens/twoWheat.png",
-    "E:/Complete_Catan/out/tradeTokens/twoWood.png"
+    "E:/Complete_Catan/out/tradeTokens/twoOre.png",
+    "E:/Complete_Catan/out/tradeTokens/threeToOne.png"
 }
 
 

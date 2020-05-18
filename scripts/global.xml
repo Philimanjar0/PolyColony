@@ -1,0 +1,31 @@
+<!-- Welcome popup -->
+
+<Defaults>
+    <Button color="black" textColor="white" />
+    <Button class="basic" onClick="generate" />
+</Defaults>
+
+<VerticalLayout
+    id="tools"
+    height="350"
+    width="80"
+    allowDragging="true"
+    returnToOriginalPositionWhenReleased="false"
+    rectAlignment="UpperLeft"
+    offsetXY="80 0"
+    >
+    <Button
+        text="clear"
+        onClick="clearBoard"
+        color="red"
+        textColor="white"
+        >
+    </Button>
+    <Button text="place&#10;small" id="0" class="basic" > </Button>
+    <Button text="place&#10;medium" id="1" class="basic" > </Button>
+    <Button text="place&#10;large" id="2" class="basic" > </Button>
+</VerticalLayout>
+
+
+
+<!-- Dice Roller UI Elements -->
