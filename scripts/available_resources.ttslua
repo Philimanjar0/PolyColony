@@ -62,5 +62,5 @@ avail_trade_small = {
     SHEEP,
     WHEAT,
     ORE,
-    DESERT, DESERT, DESERT --desert is used as the 3:1 port
+    DESERT, DESERT, DESERT, DESERT --desert is used as the 3:1 port
 }
