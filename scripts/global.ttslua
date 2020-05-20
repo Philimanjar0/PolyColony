@@ -12,6 +12,7 @@ resourceList = {} --get balanced board
 placedResourceObjects = {} --place terrain
 placedProbabilityObjects = {} --place probs
 tilePositions = {}
+boarderPositions = {}
 
 
 numWood = 4
@@ -32,10 +33,8 @@ function onSave()
 end
 
 function onLoad(saved_data)
-    tilePositions = deepcopy(land_small)
-    a = {1}
-    b = 2
-    print(dump(table.insert(a,b)))
+    calculateBoardSpecs()
+    --log(dump(getCoastalNeighborIndeces(tilePositions,boarder_small,2)))
 end
 
 function onUpdate()
@@ -44,33 +43,56 @@ end
 
 --------------------------------------- DEFINED FUNCTIONS ---------------------------------------------------------
 
-function test(param)
-
-end
-
 -- buildProbList(returnList, resourceList, probByResource)
 --main functin called from UI to call other generation functions
 function generate(_,_,idValue)
-    resourceList = getBalancedBoard()
-    local tick = 0
-    resProbDistribution = getBalancedProbs(probabilities_small)
-    probabilityList = buildProbList({}, resourceList, resProbDistribution)
-    log('resource list')
-    log(dump(resourceList))
-    log('prob distribution')
-    log(dump(resProbDistribution))
-    log('prob list')
-    log(dump(probabilityList))
+    placeBoarder(0)
+    calculateBoardSpecs()
+    --tilePositions = deepcopy(land_small)
 
-    placedResourceObjects = placeTerrain(resourceList,land_small)
+
+    --I know this is jank, but i am not sure how to combine the two functions
+    --in such a way that can recursively place both terrain and numbers
+    local counter = 0
+    while probabilityList == nil or #probabilityList == 0  do
+        resourceList = getBalancedBoard(resources_small,{},{})
+        resProbDistribution = getBalancedProbs(probabilities_small)
+        if(resProbDistribution ~= nil) then
+            probabilityList = buildProbList({}, resourceList, resProbDistribution)
+        end
+        counter = counter +1
+        if counter > 10 then
+            print('Generation timed out, please regenerate')
+            return -1
+        end
+    end
+    --log("counter: ", counter)
+    placedResourceObjects = placeTerrain(resourceList,tilePositions)
     placedProbabilityObjects = placeProbs(probabilityList, placedResourceObjects, resourceList)
+
+    --placePorts(idValue)
+    local inter =buildPortPositionArray(boarderPositions)
+    log(dump(inter))
+    local doubleinter = buildPortArray(inter,FYShuffle(avail_trade_small),{})
+    log(dump(doubleinter))
+    local portObjectList = placePorts(doubleinter)
+    placeTradeTokens(removeZeros(doubleinter),portObjectList)
+
+
+
+end
+
+function calculateBoardSpecs()
+    probabilityList = {}
+    tilePositions = deepcopy(land_small)
+    boarderPositions = deepcopy(boarder_small)
 end
 
 --places water boarder given board size
 function placeBoarder(size)
     print('placing boarder...')
     local boarderArray = {}
-    defaultLayout = boarder_small
+    local defaultLayout = boarderPositions
     if size == '1' then
         defaultLayout = boarder_medium
     end
@@ -88,35 +110,111 @@ function placeBoarder(size)
     print('boarder placed')
 end
 
-function placePorts(size)
-    print('placing ports...')
-    local portArray = {}
-    local layout = trade_small
-    for index,i in pairs(layout) do
-        portArray[index] = spawnObject(tileParams)
-        portArray[index].setCustomObject(port)
-        portArray[index].setLock(true)
-        portArray[index].setPosition({i[1],0.96,i[2]})
-        portArray[index].setRotation({0,i[3]+180,0})
+------------------------------------------------start here----------------------
+
+--returned array is of form {{direction,resource},{direction,resource}}
+--where direction is 1,2,3,4,5,6 starting facing tl and rotates cw
+function buildPortArray(oldboarder,availableTrades,returnList)
+
+    function canPlace(boarderIndex,direction,tradeToTest)
+        local indecesToTest = getCoastalNeighborIndeces(tilePositions,boarderPositions,boarderIndex)
+        local directionWeights = {}
+        for i,num in pairs(getCoastalNeighborDirections(tilePositions,boarderPositions,boarderIndex)) do
+            if num == direction then
+                table.insert(directionWeights,2)
+            else
+                table.insert(directionWeights,1)
+            end
+        end
+
+        for i,num in pairs(indecesToTest) do
+            if probabilityList[num] == 0 then
+                directionWeights[i] = 0
+                return true -- this means it is next to desert, can place anything here
+            elseif tradeToTest == DESERT then
+                directionWeights[i] = directionWeights[i]*2*probability_map[probabilityList[num]]
+            elseif resourceList[num] == tradeToTest then
+                directionWeights[i] = directionWeights[i]*3*probability_map[probabilityList[num]]
+            end
+        end
+        local sum = arraySum(directionWeights)
+        print('port ', boarderIndex, ' facing ', direction,' to trade ', tradeToTest, ' yields ', sum)
+        return sum < 25
     end
-    return portArray
+
+
+    local boarder = deepcopy(oldboarder)
+    local returnList = deepcopy(returnList)
+    local availableTrades = deepcopy(availableTrades)
+    if #boarder == 0 then
+        return returnList
+    end
+
+    local toTest = table.remove(boarder,1)
+    if toTest == 0 then
+        return buildPortArray(boarder,availableTrades,table.insert(returnList,0))
+    end
+    for i,direction in pairs(getCoastalNeighborDirections(tilePositions,boarderPositions,#returnList+1)) do
+        for j,trade in pairs(availableTrades) do
+            if canPlace(#returnList+1,direction,trade) then
+                local theRest = buildPortArray(boarder,availableTrades,table.insert(returnList,{direction,table.remove(availableTrades,j)}))
+                if theRest ~= nil then
+                    return theRest
+                end
+                    table.remove(returnList)
+            end
+        end
+    end
+    return nil
 end
 
-function placeTradeTokens(size, portObjectArray)
+--helper function that will return a list, entries alternate 0 and the next
+--boarder position. Used for ports. Every other ocean tile will have a port
+--starting TL with either open ocean or port
+function buildPortPositionArray(boarder)
+    local start = math.random(2)
+    local returnArray = {}
+    for i = start,#boarder,2 do
+        table.insert(returnArray,boarder[i])
+    end
+    for i = start%2+1,#boarder,2 do
+        table.insert(returnArray,i,0)
+    end
+    return returnArray
+end
+
+function placePorts(portArray)
+    local placedArray = {}
+    for i,tab in pairs(portArray) do
+        if tab ~= 0 then
+            table.insert(placedArray,spawnObject(tileParams))
+            placedArray[#placedArray].setCustomObject(port)
+            placedArray[#placedArray].setLock(true)
+            --placedArray[#placedArray].setPosition({i,0.96,i})
+            placedArray[#placedArray].setPosition({boarderPositions[i][1],0.96,boarderPositions[i][2]})
+            placedArray[#placedArray].setRotation({0,tab[1]*60-60,0})
+        end
+    end
+    return placedArray
+end
+
+function placeTradeTokens(portArray, portObjectArray)
     print('placeing trades...')
     local tokenArray = {}
-    local available = deepcopy(avail_trade_small)
+    --local available = deepcopy(avail_trade_small)
     local curTradeParams = deepcopy(tradeCustom)
-    for index,item in pairs(trade_small) do
-        local selectedResource = table.remove(available,math.random(#available))
-        curTradeParams.image = tradeTokenImages[selectedResource+1]
-        tokenArray[index] = spawnObject(probabilityParams)
-        tokenArray[index].setCustomObject(curTradeParams)
-        tokenArray[index].setLock(true)
-        tokenArray[index].scale(0.4)
-        tokenArray[index].setPosition(portObjectArray[index].positionToWorld(portSnap.position))
-        --tokenArray[index].setRotation(addArray(portObjectArray[index].getRotation(),portSnap.rotation))
-
+    for index,tab in pairs(portArray) do
+        if tab ~= 0 then
+            print('placing ', tab[2])
+            curTradeParams.image = tradeTokenImages[tab[2]+1]
+            table.insert(tokenArray,spawnObject(probabilityParams))
+            tokenArray[#tokenArray].setCustomObject(curTradeParams)
+            tokenArray[#tokenArray].setName(tradeTokenNicknames[tab[2]+1])
+            tokenArray[#tokenArray].setLock(true)
+            tokenArray[#tokenArray].scale(0.6)
+            tokenArray[#tokenArray].setPosition(portObjectArray[index].positionToWorld(portSnap.position))
+            tokenArray[#tokenArray].setRotation({0,tab[1]*60-90,0})
+        end
     end
 end
 
@@ -174,46 +272,45 @@ function placeTerrain(board, coords)
     return placementArray
 end
 
---returns a random board where no two of the same resource are adjacent
---starts TL and goes L-R and T-B
-function getBalancedBoard()
-    local returnSet = {}
-    local resourceArray = deepcopy(resources_small) --available resources to draw from
-    local layout = land_small
-    local tried = {}
-    local canPlace
-    for i,currentTile in pairs(layout) do
-        while #resourceArray > 0  do --try every resource in the avaiable resources
-            local canPlace = true
-            local resourceIndex = math.random(#resourceArray)
-            for j, neighbor in pairs(getNeighbors(layout, i)) do
-                --test each neighbor if it is the same as current resource we are trying to place
-                if floatEqual(returnSet[neighbor], resourceArray[resourceIndex], 2) then
-                    --if it is the same as one of the neighbors, can't place, break
-                    --add to tried list and remove from available
-                    canPlace = false
-                    table.insert(tried,table.remove(resourceArray,resourceIndex))
-                    break
-                end
-            end
-            if canPlace then
-                --if can place the resource, add it to the return set,
-                --add the tried list back to the available, set tried to empty
-                table.insert(returnSet,table.remove(resourceArray,resourceIndex))
-                resourceArray = concat(resourceArray,tried)
-                tried = {}
-                break
+--------------------------------------------------------------------------------need to reset tried and append it to avail
+function getBalancedBoard(resourceList, returnList, triedResource)
+
+    function canPlace(list, resource)
+        for i,placedResourceIndex in pairs(getNeighbors(tilePositions, #list+1)) do
+            if floatEqual(list[placedResourceIndex],resource,1) then
+                return false
             end
         end
+        return true
     end
-    -- if the placement algo backs into a corner where there is no possibility
-    --to place any tile, try again. Does not happen often
-    if #returnSet == #resources_small then
-        return returnSet
+
+    local resourceList = deepcopy(resourceList)
+    local returnList = deepcopy(returnList)
+    local triedResource = deepcopy(triedResource)
+
+    if #resourceList == 0 and #triedResource == 0 then
+        return returnList
+    elseif #resourceList == 0 and #triedResource ~= 0 then
+        return nil
+    end
+
+    local toTest = table.remove(resourceList, math.random(#resourceList))
+    --print('testing resource ', toTest, ' for index ', #returnList +1)
+    if canPlace(returnList,toTest) then
+        resourceList = concat(triedResource,resourceList)
+        triedResource = {}
+        --print(#resourceList)
+        local theRest = getBalancedBoard(resourceList,table.insert(returnList,toTest),triedResource)
+        if theRest ~= nil then
+            return theRest
+        else
+            return getBalancedBoard(resourceList,returnList,triedResource)
+        end
     else
-        return getBalancedBoard()
+        return getBalancedBoard(resourceList,returnList,table.insert(triedResource,toTest))
     end
 end
+
 
 --returns a table of resources randomly placed given a size
 --starts TL and goes L-R and T-B
@@ -226,42 +323,27 @@ function getRandomBoard(size)
     end
     return returnSet
 end
---------------------------------------------------start working here.... recursion is needed...
--- function buildSortedProbs(terrainList, probsByResource, probabilityList)
---     local returnSet = {}
---     local availProbs = deepcopy(probsByResource)
---     local layout = land_small
---     for i,resource in pairs(terrainList) do --each terrain
---         local canPlace = true
---         if(resource ~= 5) then
---             --log(resource)
---             for j,num in pairs(availProbs[resource+1]) do --each avail prob
---                 for k, placedProbIndex in pairs(getNeighbors(layout, i)) do
---                     print('checking if neighbor ', returnSet[placedProbIndex], ' at ', placedProbIndex, ' = prob ', num)
---                     if floatEqual(returnSet[placedProbIndex],num,1) then
---                         --print('yes')
---                         canPlace = false
---                         break
---                     end
---                 end
---                 if canPlace then
---                     print('no, inserting ', num, ' at ', i)
---                     table.insert(returnSet,table.remove(availProbs[resource+1],j))
---                     break
---                 end
---             end
---             if not canPlace then
---                 print('---------------------fail')
---                 return {-1}
---             end
---         else
---             table.insert(returnSet,0)
---         end
---     end
---     return returnSet
--- end
+
 
 function buildProbList(returnList, resourceList, probByResource)
+
+    function canPlace(currentBoard, num)
+        local canPlace = true
+        for i, placedProbIndex in pairs(getNeighbors(tilePositions, #currentBoard+1)) do
+            if floatEqual(currentBoard[placedProbIndex],num,1) then
+                canPlace = false
+                break
+            end
+            if probability_map[num] == 5 then
+                if floatEqual(probability_map[currentBoard[placedProbIndex]],5,1) then
+                    canPlace = false
+                end
+            end
+        end
+        return canPlace
+    end
+
+
     local returnList = deepcopy(returnList)
     local resourceList = deepcopy(resourceList)
     local probByResource = deepcopy(probByResource)
@@ -278,29 +360,11 @@ function buildProbList(returnList, resourceList, probByResource)
                 --log(probToTest)
                 return theRest
             end
+            table.remove(returnList)
         end
     end
     return nil
 end
-
-function canPlace(currentBoard, num)
-    local canPlace = true
-    for i, placedProbIndex in pairs(getNeighbors(tilePositions, #currentBoard+1)) do
-        if floatEqual(currentBoard[placedProbIndex],num,1) then
-            canPlace = false
-            break
-        end
-        if probability_map[num] == 5 then
-            if floatEqual(probability_map[currentBoard[placedProbIndex]],5,1) then
-                canPlace = false
-            end
-        end
-    end
-    return canPlace
-end
-
-
-
 
 function getBalancedProbs(probArray)
     local averageReturnFloor = 3
@@ -503,6 +567,17 @@ function deepcopy(orig)
     return copy
 end
 
+--thanks to stackoverflow user hjpotter92 for this function
+function FYShuffle(tInput)
+    local tReturn = {}
+    for i = #tInput, 1, -1 do
+        local j = math.random(i)
+        tInput[i], tInput[j] = tInput[j], tInput[i]
+        table.insert(tReturn, tInput[i])
+    end
+    return tReturn
+end
+
 --helper function for printing table contents
 --credit to stackoverflow user Matt
 function dump(o)
@@ -533,12 +608,24 @@ function getNeighbors(list, index)
     return test
 end
 
-function getCoastalNeighbors(landList,waterList,waterIndex)
+function getCoastalNeighborDirections(landList,waterList,waterIndex)
     local returnArray = {}
     for i,neighbor in pairs(getAdjacent(waterList[waterIndex][1],waterList[waterIndex][2])) do
         for _, land in pairs(landList) do
             if floatEqual(land[1],neighbor[1],1) and floatEqual(land[2],neighbor[2],1) then
                 table.insert(returnArray,i)
+            end
+        end
+    end
+    return returnArray
+end
+
+function getCoastalNeighborIndeces(landList,waterList,waterIndex)
+    local returnArray = {}
+    for i,neighbor in pairs(getAdjacent(waterList[waterIndex][1],waterList[waterIndex][2])) do
+        for j, land in pairs(landList) do
+            if floatEqual(land[1],neighbor[1],1) and floatEqual(land[2],neighbor[2],1) then
+                table.insert(returnArray,j)
             end
         end
     end
@@ -587,6 +674,16 @@ function arraySum(array)
         returnVal = returnVal + num
     end
     return returnVal
+end
+
+function removeZeros(array)
+    local returnTable = {}
+    for i,num in pairs(array) do
+        if num ~= 0 then
+            table.insert(returnTable,num)
+        end
+    end
+    return returnTable
 end
 
 function duplicateProbs(probTable)
