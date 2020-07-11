@@ -1,4 +1,4 @@
-# Blender MTL File: 'None'
+# Blender MTL File: 'road.blend'
 # Material Count: 2
 
 newmtl RoadBaseMat
@@ -11,10 +11,10 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl RoadWhiteMat
+newmtl RoadColorMat
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
-Kd 0.351533 0.341914 0.467784
+Kd 0.417885 0.266356 0.035601
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
