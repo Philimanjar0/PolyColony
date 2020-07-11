@@ -1,0 +1,891 @@
+--------------------------- INCLUDES,  only contains tables that are referenced, not changed---------
+#include snaps
+#include models
+#include boarders
+#include land_placements
+#include available_resources
+
+
+config_mapping = {{},{},{}}
+     --3-4 player selection
+    config_mapping[1].resourceTilePositions = land_small
+    config_mapping[1].boarderPositions = boarder_small
+    config_mapping[1].resources = resources_small
+    config_mapping[1].probabilities = probabilities_small
+    config_mapping[1].trade = avail_trade_small
+    config_mapping[1].tableScale = {1.5,1.25}
+
+    --5 player selection, for now just same as 3-4 player
+    config_mapping[2].resourceTilePositions = land_small
+    config_mapping[2].boarderPositions = boarder_small
+    config_mapping[2].resources = resources_small
+    config_mapping[2].probabilities = probabilities_small
+    config_mapping[2].trade = avail_trade_small
+
+    --6 player selection, for now same as 3-4 player
+    config_mapping[3].resourceTilePositions = land_small
+    config_mapping[3].boarderPositions = boarder_small
+    config_mapping[3].resources = resources_small
+    config_mapping[3].probabilities = probabilities_small
+    config_mapping[3].trade = avail_trade_small
+
+----------------------------------------VARIABLES updated and read, initialize to 0 --------------------
+--probabilityPositions = {}
+resProbDistribution = {} -- getBalancedProbs
+unsortedProbabilityList = {}
+probabilityList = {} --buildSortedProbs
+resourceList = {} --get balanced board
+tradeList = {} --
+placedResourceObjects = {} --place terrain
+placedProbabilityObjects = {} --place probs
+resourceTilePositions = {}
+boarderPositions = {}
+unsortedResourceList = {}
+numberOfResourcesByType = {0,0,0,0,0,0} --wood,clay,ore,wheat,desert
+
+
+trade_counter = 0 --i know this is bad,its getting worked on
+
+
+userConfig = {}
+userConfig.numPlayers = 1
+userConfig.boardConfig = 1
+
+player_locations = {{},{},{},{},{},{}}
+player_locations[1].position = {12.5,4,-24}
+player_locations[1].rotation = {0,0,0}
+player_locations[1].scale = {10,5,5}
+
+player_locations[2].position = {-13,4,-24}
+player_locations[2].rotation = {0,0,0}
+player_locations[2].scale = {10,5,5}
+
+player_locations[3].position = {13,4,24}
+player_locations[3].rotation = {0,180,0}
+player_locations[3].scale = {10,5,5}
+
+player_locations[4].position = {-13,4,24}
+player_locations[4].rotation = {0,180,0}
+player_locations[4].scale = {10,5,5}
+
+player_locations[5].position = {26,4,0}
+player_locations[5].rotation = {0,-90,0}
+player_locations[5].scale = {10,5,5}
+
+player_locations[6].position = {-26,4,0}
+player_locations[6].rotation = {0,90,0}
+player_locations[6].scale = {10,5,5}
+
+
+----------------------------------------- AUTOMATIC EVENT DRIVEN FUNCTIONS ---------------------
+function onSave()
+    --local data_to_save = {}
+    --saved_data = JSON.encode(data_to_save)
+    --saved_data = "" --Remove -- at start + save to clear save data
+    --return saved_data
+end
+
+function onLoad(saved_data)
+
+end
+
+
+function onUpdate()
+    --called every frame
+end
+
+--------------------------------------UI EVENT DRIVEN FUNCITONS -----------------------------
+function updateUserSettings(player,value,id)
+    if id=="numPlayers" then
+        userConfig.numPlayers=value
+    elseif id=="boardConfig" then
+        userConfig.boardConfig=value
+    end
+end
+
+function minimizeUI()
+    UI.hide("window")
+    UI.show("minUI")
+
+end
+
+function openUI()
+    UI.hide("minUI")
+    UI.show("window")
+end
+
+--------------------------------------- DEFINED FUNCTIONS ---------------------------------------
+function calculateBoardSpecs()
+    probabilityList = {}
+    unsortedResourceList = config_mapping[userConfig.numPlayers].resources
+    numberOfResourcesByType = updateNumberOfResourcesByType(unsortedResourceList)
+    resourceTilePositions = deepCopy(config_mapping[userConfig.numPlayers].resourceTilePositions)
+    boarderPositions = deepCopy(config_mapping[userConfig.numPlayers].boarderPositions)
+    tradeList = config_mapping[userConfig.numPlayers].trade
+    unsortedProbabilityList = config_mapping[userConfig.numPlayers].probabilities
+end
+
+
+-- buildProbList(returnList, resourceList, probByResource)
+--main functin called from UI to call other generation functions
+function generate(_,_,idValue)
+
+    calculateBoardSpecs()
+    buildTable(config_mapping[userConfig.numPlayers].tableScale[1], config_mapping[userConfig.numPlayers].tableScale[2])
+    --I know this is jank, but i am not sure how to combine the two functions
+    --in such a way that can recursively place both terrain and numbers
+    --to end any searches that take too long, these counters are for timeouts
+
+
+
+    local counter = 0
+    trade_counter = 0
+    while probabilityList == nil or #probabilityList == 0  do
+        resourceList = getBalancedBoard(unsortedResourceList,{},{})
+        resProbDistribution = getBalancedProbs(unsortedProbabilityList)
+        if(resProbDistribution ~= nil) then
+            probabilityList = buildProbList({}, resourceList, resProbDistribution)
+        end
+        counter = counter +1
+        if counter > 7 then
+            printToAll('[WARN] Generation timed out, please regenerate', Color.orange)
+            return 0
+        end
+    end
+    placedResourceObjects = placeTerrain(resourceList,resourceTilePositions)
+    placedProbabilityObjects = placeProbs(probabilityList, placedResourceObjects, resourceList)
+    placeBoarder()
+    local sortedTradeArray = buildPortArray(buildPortPositionArray(boarderPositions),FYShuffle(avail_trade_small),{})
+    local portObjectList = placePorts(sortedTradeArray)
+    placeTradeTokens(removeZeros(sortedTradeArray),portObjectList)
+    resourceCards({-17,0,0}, {0,90,0}, 20)
+end
+
+
+
+function updateNumberOfResourcesByType(resourceList)
+    returnList = {0,0,0,0,0,0}
+    for i,res in pairs(resourceList) do
+        returnList[res+1] = returnList[res+1]+1
+    end
+    return returnList
+end
+
+function buildTable(lengthScale, widthScale)
+    local table = spawnObject(tableObjectParams)
+    table.setCustomObject(tableAssets)
+    table.setLock(true)
+    table.setPosition({0,-0.25,0})
+    table.scale({lengthScale,1,widthScale})
+
+    local front = spawnObject(tableObjectParams)
+    front.setCustomObject(bumperAssets)
+    front.setLock(true)
+    front.setPosition({0,-1.5,-1* widthScale * 25+2.5})
+    front.setRotation({0,180,0})
+    front.scale({lengthScale,1,1})
+    front.static_friction=0.1
+    front.dynamic_friction=0.1
+
+    local back =  spawnObject(tableObjectParams)
+    back.setCustomObject(bumperAssets)
+    back.setLock(true)
+    back.setPosition({0,-1.5,widthScale * 25-2.5})
+    back.setRotation({0,0,0})
+    back.scale({lengthScale,1,1})
+    back.static_friction=0.1
+    back.dynamic_friction=0.1
+
+    local left = spawnObject(tableObjectParams)
+    left.setCustomObject(bumperAssets)
+    left.setLock(true)
+    left.setPosition({lengthScale * 25,-1.5,0})
+    left.setRotation({0,90,0})
+    left.scale({widthScale,1,1})
+    left.static_friction=0.1
+    left.dynamic_friction=0.1
+
+    local right = spawnObject(tableObjectParams)
+    right.setCustomObject(bumperAssets)
+    right.setLock(true)
+    right.setPosition({-1 * lengthScale * 25,-1.5,0})
+    right.setRotation({0,270,0})
+    right.scale({widthScale,1,1})
+    right.static_friction=0.1
+    right.dynamic_friction=0.1
+
+    Wait.condition(function ()
+        printToAll('[INFO] Table loaded',Color.Green)
+        initHands(lengthScale,widthScale)
+    end,
+    function ()
+        return not right.loading_custom and not right.spawning
+    end)
+end
+
+function initHands(lengthScale,widthScale)
+    function scaleHandTransform(params,lScale,wScale)
+        local pos = deepCopy(params.position)
+        local par = deepCopy(params)
+        pos[1] = pos[1] * lScale
+        pos[2] = pos[2]
+        pos[3] = pos[3] * wScale
+        par.position = pos
+        return par
+    end
+
+    local players = Player.getPlayers()
+    local colors = Player.getAvailableColors()
+    for _,play in pairs(players) do
+        play.changeColor("Grey")
+    end
+    log(dump(Player.getAvailableColors()))
+    for i,play in pairs(players) do
+        play.changeColor(Player.getAvailableColors()[i])
+    end
+    for i,color in pairs(colors) do
+        Player[color].setHandTransform(player_locations[i])
+        Player[color].setHandTransform(scaleHandTransform(player_locations[i],lengthScale,widthScale))
+    end
+    printToAll('[INFO] players assigned',Color.Green)
+    initPlayerPieces()
+end
+
+function initPlayerPieces()
+    local players = Player.getPlayers()
+    for i,play in pairs(players) do
+        local pos = {play.getHandTransform().position.x, 1, play.getHandTransform().position.z}
+        local forward = {play.getHandTransform().forward.x, play.getHandTransform().forward.y, play.getHandTransform().forward.z}
+        for j,playPiece in pairs(player_pieces) do
+            local piece = spawnObject(tileParams)
+            if (playPiece == ROAD) then
+                roadAssets.diffuse = player_piece_diffuse.road[i]
+                piece.setCustomObject(roadAssets)
+            elseif (playPiece == SETTLEMENT) then
+                settlementAssets.diffuse = player_piece_diffuse.settlement[i]
+                piece.setCustomObject(settlementAssets)
+            elseif (playPiece == CITY) then
+                cityAssets.diffuse = player_piece_diffuse.city[i]
+                piece.setCustomObject(cityAssets)
+            else
+                printToAll('[ERROR] no assets found for player piece', Color.red)
+            end
+            piece.setPosition(addArray(player_piece_locations[j], addArray(pos, scaleVector(forward, 6))))
+            piece.setRotation(play.getHandTransform().rotation)
+        end
+    end
+end
+
+--places water boarder given board size
+function placeBoarder()
+    local boarderArray = {}
+    local defaultLayout = boarderPositions
+    for index,pos in pairs(defaultLayout) do
+        boarderArray[index] = spawnObject(tileParams)
+        boarderArray[index].setCustomObject(ocean)
+        boarderArray[index].setPosition({pos[1],0.96,pos[2]})
+        boarderArray[index].setRotation({0,60*math.random(6),0})
+        boarderArray[index].setSnapPoints(concat(tileSnap,{}))
+        boarderArray[index].setLock(true)
+    end
+end
+
+------------------------------------------------start here----------------------
+
+--returned array is of form {{direction,resource},{direction,resource}}
+--where direction is 1,2,3,4,5,6 starting facing tl and rotates cw
+function buildPortArray(oldboarder,origAvailableTrades,returnList)
+
+    function canPlace(boarderIndex,direction,tradeToTest)
+        trade_counter = trade_counter + 1
+        local indecesToTest = getCoastalNeighborIndeces(resourceTilePositions,boarderPositions,boarderIndex)
+        local directionWeights = {}
+        for i,num in pairs(getCoastalNeighborDirections(resourceTilePositions,boarderPositions,boarderIndex)) do
+            if num == direction then
+                table.insert(directionWeights,2)
+            else
+                table.insert(directionWeights,1)
+            end
+        end
+
+        for i,num in pairs(indecesToTest) do
+            if probabilityList[num] == 0 then
+                directionWeights[i] = 0
+                return true -- this means it is next to desert, can place anything here
+            elseif tradeToTest == DESERT then
+                directionWeights[i] = directionWeights[i]*2*probability_map[probabilityList[num]]
+            elseif resourceList[num] == tradeToTest then
+                directionWeights[i] = directionWeights[i]*3*probability_map[probabilityList[num]]
+            end
+        end
+        local sum = arraySum(directionWeights)
+        return sum < 30 and sum > 3
+    end
+
+
+    local boarder = deepCopy(oldboarder)
+    local returnList = deepCopy(returnList)
+    local availableTrades = deepCopy(origAvailableTrades)
+
+    if #boarder == 0 then
+        return returnList
+    end
+
+
+
+
+    local toTest = table.remove(boarder,1)
+    if toTest == 0 then
+        return buildPortArray(boarder,availableTrades,table.insert(returnList,0))
+    end
+    for i,direction in pairs(getCoastalNeighborDirections(resourceTilePositions,boarderPositions,#returnList+1)) do
+        for j,trade in pairs(availableTrades) do
+            if trade_counter > 500 then
+                return nil
+            end
+            if canPlace(#returnList+1,direction,trade) then
+                local tempTradeSolution = table.remove(availableTrades,j)
+                local theRest = buildPortArray(boarder,availableTrades,table.insert(returnList,{direction,tempTradeSolution}))
+                if theRest ~= nil then
+                    return theRest
+                end
+                table.insert(availableTrades,j,tempTradeSolution)
+                table.remove(returnList)
+            end
+        end
+        --availableTrades = deepCopy(origAvailableTrades)
+    end
+    return nil
+end
+
+--helper function that will return a list, entries alternate 0 and the next
+--boarder position. Used for ports. Every other ocean tile will have a port
+--starting TL with either open ocean or port
+function buildPortPositionArray(boarder)
+    local start = math.random(2)
+    local returnArray = {}
+    for i = start,#boarder,2 do
+        table.insert(returnArray,boarder[i])
+    end
+    for i = start%2+1,#boarder,2 do
+        table.insert(returnArray,i,0)
+    end
+    return returnArray
+end
+
+function placePorts(portArray)
+    local placedArray = {}
+    for i,tab in pairs(portArray) do
+        if tab ~= 0 then
+            table.insert(placedArray,spawnObject(tileParams))
+            placedArray[#placedArray].setCustomObject(port)
+            placedArray[#placedArray].setLock(true)
+            --placedArray[#placedArray].setPosition({i,0.96,i})
+            placedArray[#placedArray].setPosition({boarderPositions[i][1],0.96,boarderPositions[i][2]})
+            placedArray[#placedArray].setRotation({0,tab[1]*60-60,0})
+        end
+    end
+    return placedArray
+end
+
+function placeTradeTokens(portArray, portObjectArray)
+    local tokenArray = {}
+    local curTradeParams = deepCopy(tradeCustom)
+    for index,tab in pairs(portArray) do
+        if tab ~= 0 then
+            curTradeParams.image = tradeTokenImages[tab[2]+1]
+            table.insert(tokenArray,spawnObject(probabilityParams))
+            tokenArray[#tokenArray].setCustomObject(curTradeParams)
+            tokenArray[#tokenArray].setName(tradeTokenNicknames[tab[2]+1])
+            tokenArray[#tokenArray].setLock(true)
+            tokenArray[#tokenArray].scale(0.6)
+            tokenArray[#tokenArray].setPosition(portObjectArray[index].positionToWorld(portSnap.position))
+            tokenArray[#tokenArray].setRotation({0,tab[1]*60-90,0})
+        end
+    end
+end
+
+--spawn and place terrain tiles given a resource distribution and table
+--of coordinates
+function placeTerrain(board, coords)
+    local b = board
+    local placementArray = {}
+    for index,resource in pairs(b) do
+        placementArray[index] = spawnObject(tileParams)
+        if resource == SHEEP then
+            placementArray[index].setCustomObject(sheep)
+            placementArray[index].setName('sheep')
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[3]))
+        elseif resource == WOOD then
+            placementArray[index].setCustomObject(wood)
+            placementArray[index].setName('wood')
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[1]))
+        elseif resource == CLAY then
+            placementArray[index].setCustomObject(clay)
+            placementArray[index].setName('brick')
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[2]))
+        elseif resource == DESERT then
+            placementArray[index].setCustomObject(desert)
+            placementArray[index].setName('desert')
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[6]))
+        elseif resource == WHEAT then
+            placementArray[index].setCustomObject(wheat)
+            placementArray[index].setName('wheat')
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[4]))
+        elseif resource == ORE then
+            placementArray[index].setCustomObject(ore)
+            placementArray[index].setName('ore')
+            placementArray[index].setSnapPoints(concat(tileSnap,resource_spec_snaps[5]))
+        else
+            printToAll("[ERROR] No terrain model found", Color.Red)
+        end
+        placementArray[index].setPosition({coords[index][1],0.96,coords[index][2]})
+        placementArray[index].setRotation({0,60*math.random(6),0})
+        placementArray[index].setLock(true)
+    end
+    return placementArray
+end
+
+--------------------------------------------------------------------------------need to reset tried and append it to avail
+function getBalancedBoard(resourceList, returnList, triedResource)
+
+    function canPlace(list, resource)
+        for i,placedResourceIndex in pairs(getNeighbors(resourceTilePositions, #list+1)) do
+            if floatEqual(list[placedResourceIndex],resource,1) then
+                return false
+            end
+        end
+        return true
+    end
+
+    local resourceList = deepCopy(resourceList)
+    local returnList = deepCopy(returnList)
+    local triedResource = deepCopy(triedResource)
+
+    if #resourceList == 0 and #triedResource == 0 then
+        return returnList
+    elseif #resourceList == 0 and #triedResource ~= 0 then
+        return nil
+    end
+
+    local toTest = table.remove(resourceList, math.random(#resourceList))
+    if canPlace(returnList,toTest) then
+        resourceList = concat(triedResource,resourceList)
+        triedResource = {}
+        local theRest = getBalancedBoard(resourceList,table.insert(returnList,toTest),triedResource)
+        if theRest ~= nil then
+            return theRest
+        else
+            return getBalancedBoard(resourceList,returnList,triedResource)
+        end
+    else
+        return getBalancedBoard(resourceList,returnList,table.insert(triedResource,toTest))
+    end
+end
+
+
+--returns a table of resources randomly placed given a size
+--starts TL and goes L-R and T-B
+function getRandomBoard(size)
+    local returnSet = {}
+    local layout = land_small
+    local resources = deepCopy(resources_small)
+    for i,pos in pairs(layout) do
+        table.insert(returnSet,table.remove(resources,math.random(#resources)))
+    end
+    return returnSet
+end
+
+
+function buildProbList(returnList, resourceList, origprobByResource)
+
+    function canPlace(currentBoard, num)
+        local canPlace = true
+        for i, placedProbIndex in pairs(getNeighbors(resourceTilePositions, #currentBoard+1)) do
+            if floatEqual(currentBoard[placedProbIndex],num,1) then
+                canPlace = false
+                break
+            end
+            if probability_map[num] == 5 then
+                if floatEqual(probability_map[currentBoard[placedProbIndex]],5,1) then
+                    canPlace = false
+                end
+            end
+        end
+        return canPlace
+    end
+
+
+    local returnList = deepCopy(returnList)
+    local resourceList = deepCopy(resourceList)
+    local probByResource = deepCopy(origprobByResource)
+    if #resourceList == 0 then
+        return returnList
+    end
+    --log(resourceList[1])
+    local selectedResource = table.remove(resourceList,1)
+    for i,probToTest in pairs(probByResource[selectedResource+1]) do
+        if canPlace(returnList, probToTest) then
+            table.remove(probByResource[selectedResource+1],i)
+            local theRest = buildProbList(table.insert(returnList, probToTest),resourceList,probByResource)
+            if theRest ~= nil then
+                --log(probToTest)
+                return theRest
+            end
+            table.remove(returnList)
+        end
+    end
+    return nil
+end
+
+function getBalancedProbs(probArray)
+    local averageReturnFloor = 3
+    local averageReturnCeiling = 3.5
+    local woodProbs = {}
+    local clayProbs = {}
+    local sheepProbs = {}
+    local wheatProbs = {}
+    local oreProbs = {}
+
+    function localProb()
+        local availProbs = deepCopy(probArray)
+        woodProbs = {}
+        clayProbs = {}
+        sheepProbs = {}
+        wheatProbs = {}
+        oreProbs = {}
+        local tempSum = 0
+        for i = 1,numberOfResourcesByType[1] do
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(woodProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numberOfResourcesByType[1]) then
+                return false
+            end
+        end
+        if tempSum < averageReturnFloor*numberOfResourcesByType[1] then
+            return false
+        end
+        tempSum = 0
+
+        for i = 1,numberOfResourcesByType[2] do
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(clayProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numberOfResourcesByType[2]) then
+                return false
+            end
+        end
+        if tempSum < averageReturnFloor*numberOfResourcesByType[2] then
+            return false
+        end
+        tempSum = 0
+
+        for i = 1,numberOfResourcesByType[3] do
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(sheepProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numberOfResourcesByType[3]) then
+                return false
+            end
+        end
+        if tempSum < averageReturnFloor*numberOfResourcesByType[3] then
+            return false
+        end
+        tempSum = 0
+
+        for i = 1,numberOfResourcesByType[4] do
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(wheatProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numberOfResourcesByType[4]) then
+                return false
+            end
+        end
+        if tempSum < averageReturnFloor*numberOfResourcesByType[4] then
+            return false
+        end
+        tempSum = 0
+
+        for i = 1,numberOfResourcesByType[5] do
+            local tempReturn = table.remove(availProbs,math.random(#availProbs))
+            tempSum = tempSum + probability_map[tempReturn]
+            table.insert(oreProbs, tempReturn)
+            if(tempSum > averageReturnCeiling*numberOfResourcesByType[5]) then
+                return false
+            end
+        end
+        if tempSum < averageReturnFloor*numberOfResourcesByType[5] then
+            return false
+        end
+        return not duplicateProbs(deepCopy({woodProbs,clayProbs,sheepProbs,wheatProbs,oreProbs,}))
+    end
+
+    local tick = 0
+    while not localProb()  do
+        tick = tick + 1
+    end
+
+    if tick < 500 then
+        return{woodProbs,clayProbs,sheepProbs,wheatProbs,oreProbs,{0}}
+    else
+        print('[WARN], balancing probabilites by resource timed out', Color.Orange)
+        return{}
+    end
+end
+
+--randomly distribute probabilities to board
+--uses probabilityCustom built by generate terrain
+function generateRandomProbs(availableProbs)
+    local availProbs = deepCopy(availableProbs)
+    local returnArray = {}
+    for index,pos in pairs(availableProbs) do
+        table.insert(returnArray,table.remove(availProbs,math.random(#availProbs)))
+    end
+    return returnArray
+end
+
+function placeProbs(probList, placedResources, resourceList)
+    if(probList==nil) then
+        return {}
+    end
+    local placementArray = {}
+    local probCustParams = deepCopy(probabilityCustom)
+    local availProbs = deepCopy(probList)
+    for i,tile in pairs(placedResources) do
+        if(tile.getName() ~= 'desert') then
+            local selectedProb = table.remove(availProbs,1)
+            placementArray[i] = spawnObject(probabilityParams)
+            probCustParams.image = probabilityImages[selectedProb-1-math.floor(selectedProb/7)]
+            placementArray[i].setCustomObject(probCustParams)
+            placementArray[i].scale(0.5)
+            placementArray[i].setPosition(tile.positionToWorld(resource_spec_snaps[resourceList[i]+1][1].position))
+            placementArray[i].setRotation({0,180,0})
+            placementArray[i].setLock(true)
+            placementArray[i].setName(tile.getName() .. " : " .. probabilityNicknames[selectedProb-1-math.floor(selectedProb/7)])
+        else
+            table.remove(availProbs,1)
+        end
+    end
+    return placementArray
+end
+
+
+--resourceCards takes center position of row of cards,
+--rotation of the row, and num cards per stack
+function resourceCards(position, rotation, numCards)
+    deck = spawnObject(deckParams)
+    deck.setCustomObject(resourceDeck)
+    deck.setRotation(rotation)
+    local oreCard = deck.takeObject({})
+    oreCard.setPosition(position)
+    local wheatCard = deck.takeObject({})
+    wheatCard.setPosition(oreCard.positionToWorld({3,0,0}))
+    local woodCard = deck.takeObject({})
+    woodCard.setPosition(oreCard.positionToWorld({6,0,0}))
+    local sheepCard = deck.takeObject({})
+    sheepCard.setPosition(oreCard.positionToWorld({-3,0,0}))
+    local brickCard = deck.takeObject({})
+    brickCard.setPosition(oreCard.positionToWorld({-6,0,0}))
+    for i=1,numCards do
+        oreCard.clone().setPosition(position)
+    end
+    for i=1,numCards do
+        wheatCard.clone().setPosition(oreCard.positionToWorld({3,0,0}))
+    end
+    for i=1,numCards do
+        woodCard.clone().setPosition(oreCard.positionToWorld({6,0,0}))
+    end
+    for i=1,numCards do
+        sheepCard.clone().setPosition(oreCard.positionToWorld({-3,0,0}))
+    end
+    for i=1,numCards do
+        brickCard.clone().setPosition(oreCard.positionToWorld({-6,0,0}))
+    end
+
+    devDeck = spawnObject(deckParams)
+    devDeck.setCustomObject(developementDeck)
+    devDeck.setRotation(addArray(rotation, {180,90,0}))
+    devDeck.setPosition(oreCard.positionToWorld({0,0,-3.5}))
+    devDeck.shuffle()
+end
+
+--from UI, deletes all objects in the world
+function clearBoard()
+    list = getAllObjects()
+    printToAll('[INFO] clearing all objects', Color.Green)
+    for index,ob in pairs(list) do
+        destroyObject(ob)
+    end
+end
+
+--helper function to take combine two tables
+--concatinates second given to first, returns the result
+function concat(a,b)
+    local result = {}
+    for _,v in pairs (a) do table.insert(result, v) end
+    for _,v in pairs (b) do table.insert(result, v) end
+    return result
+end
+
+
+--helper function to copy contents of table to another table
+function deepCopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepCopy(orig_key)] = deepCopy(orig_value)
+        end
+        setmetatable(copy, deepCopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+--thanks to stackoverflow user hjpotter92 for this function
+function FYShuffle(tInput)
+    local tReturn = {}
+    for i = #tInput, 1, -1 do
+        local j = math.random(i)
+        tInput[i], tInput[j] = tInput[j], tInput[i]
+        table.insert(tReturn, tInput[i])
+    end
+    return tReturn
+end
+
+--helper function for printing table contents
+--credit to stackoverflow user Matt
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+--return the neighbors as indeces of the provided table that are neighbors
+--of the given index
+--ie 1's neighbors are 2,4,and 5 of small terrain
+function getNeighbors(list, index)
+    local test = {}
+    local adjacency = getAdjacent(list[index][1],list[index][2])
+    for _,adjPoint in pairs(adjacency) do
+        for i,tablePoint in pairs(list) do
+            if floatEqual(adjPoint[1],tablePoint[1],1) and floatEqual(adjPoint[2], tablePoint[2],1) then
+                table.insert(test, i)
+            end
+        end
+    end
+    return test
+end
+
+function getCoastalNeighborDirections(landList,waterList,waterIndex)
+    local returnArray = {}
+    for i,neighbor in pairs(getAdjacent(waterList[waterIndex][1],waterList[waterIndex][2])) do
+        for _, land in pairs(landList) do
+            if floatEqual(land[1],neighbor[1],1) and floatEqual(land[2],neighbor[2],1) then
+                table.insert(returnArray,i)
+            end
+        end
+    end
+    return returnArray
+end
+
+function getCoastalNeighborIndeces(landList,waterList,waterIndex)
+    local returnArray = {}
+    for i,neighbor in pairs(getAdjacent(waterList[waterIndex][1],waterList[waterIndex][2])) do
+        for j, land in pairs(landList) do
+            if floatEqual(land[1],neighbor[1],1) and floatEqual(land[2],neighbor[2],1) then
+                table.insert(returnArray,j)
+            end
+        end
+    end
+    return returnArray
+end
+
+--getAdjacent takes x(left-right) and z(forward-back)
+--returns table of centers of 6 adjecent hex
+--starting tl and going cw
+function getAdjacent(x,z)
+    local returnArray = {}
+    table.insert(returnArray,{x-1.99,z+3.45})
+    table.insert(returnArray,{x+1.99,z+3.45})
+    table.insert(returnArray,{x+3.98,z})
+    table.insert(returnArray,{x+1.99,z-3.45})
+    table.insert(returnArray,{x-1.99,z-3.45})
+    table.insert(returnArray,{x-3.98,z})
+    return returnArray
+end
+
+--helper function to compare floats and deal with nil values
+--takes two values and a precision (number of decimal places)
+--returns true if two values are equivalent within given precision
+--does not round
+function floatEqual(num1, num2, precision)
+    if(num1 ~= nil and num2 ~= nil) then
+        return math.floor(num1*(10^precision)) == math.floor(num2*(10^precision))
+    elseif num1 == nil and num2 == nil then
+        return true
+    end
+    return false
+end
+
+function scaleVector(vector, factor)
+    local scaled = deepCopy(vector)
+    for i,num in pairs(scaled) do
+        assert(type(num) == 'number', "Can not scale vector of non number entries")
+        scaled[i] = num*factor
+    end
+    return scaled
+end
+
+function addArray(array1, array2)
+    assert(#array1 == #array2, "Arrays are not of equivalent size")
+    local returnArray = {}
+    for index,_ in pairs(array1) do
+        returnArray[index] = array1[index] + array2[index]
+    end
+    return returnArray
+end
+
+function arraySum(array)
+    local returnVal = 0
+    for _,num in pairs(array) do
+        returnVal = returnVal + num
+    end
+    return returnVal
+end
+
+function removeZeros(array)
+    local returnTable = {}
+    for i,num in pairs(array) do
+        if num ~= 0 then
+            table.insert(returnTable,num)
+        end
+    end
+    return returnTable
+end
+
+function duplicateProbs(probTable)
+    if #probTable == 0 then
+        return false
+    end
+    local cur = table.remove(probTable)
+    if type(cur) == 'table' then
+        return duplicateProbs(cur) or duplicateProbs(probTable)
+    else
+        for _,num in pairs(probTable) do
+            if cur == num then
+                return true
+            end
+        end
+    end
+    return false or duplicateProbs(probTable)
+end

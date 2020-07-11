@@ -3,32 +3,32 @@
 tileSnap = {
     {
         position = {2,0.1,0},
-        rotation = {0,0,0},
+        rotation = {0,90,0},
         rotation_snap = true
     },
     {
         position = {-2,0.1,0},
-        rotation = {0,180,0},
+        rotation = {0,90,0},
         rotation_snap = true
     },
     {
         position = {1,0.1,1.725},
-        rotation = {0,-60,0},
+        rotation = {0,30,0},
         rotation_snap = true
     },
     {
         position = {-1,0.1,1.725},
-        rotation = {0,-120,0},
+        rotation = {0,-30,0},
         rotation_snap = true
     },
     {
         position = {-1,0.1,-1.725},
-        rotation = {0,-240,0},
+        rotation = {0,-150,0},
         rotation_snap = true
     },
     {
         position = {1,0.1,-1.725},
-        rotation = {0,-300,0},
+        rotation = {0,-210,0},
         rotation_snap = true
     },
     -- snap point locations and rotations for intersections
@@ -87,5 +87,13 @@ resource_spec_snaps = {
 portSnap = {}
 portSnap.position = {-0.493, 0.36, 0.927}
 portSnap.rotation = {0,30,0}
+
+player_piece_locations = {
+    {-2,0,2}, {-2,0,1}, {-2,0,0}, {-2,0,-1}, {-2,0,-2},
+    {-1,0,2}, {-1,0,1}, {-1,0,0}, {-1,0,-1}, {-1,0,-2},
+    {0,0,2}, {0,0,1}, {0,0,0}, {0,0,-1}, {0,0,-2},
+    {1,0,2}, {1,0,1}, {1,0,0}, {1,0,-1}, {1,0,-2},
+    {2,0,2}, {2,0,1}, {2,0,0}, {2,0,-1}
+}
 
 print('snap points imported')
