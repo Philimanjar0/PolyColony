@@ -1,31 +1,94 @@
-<!-- Welcome popup -->
+<XmlLayout xmlns="http://www.w3schools.com"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-<Defaults>
-    <Button color="black" textColor="white" />
-    <Button class="basic" onClick="generate" />
-</Defaults>
+    <Defaults>
+        <Cell class="title_block" columnSpan="2"/>
+        <Text class="h1" fontSize="30" color="black" fontStyle="Bold"/>
+        <Text class="h2" fontSize="21" color="black"/>
+        <Row class="menu1" preferredHeight="120"/>
+        <Button class="close" color="red" textColor="white" rectAlignment="UpperRight" text="X" width="45"/>
+        <Button class="minimize" color="white" textColor="black" rectAlignment="UpperRight" text="__" width="45" active="false" />
+    </Defaults>
 
-<VerticalLayout
-    id="tools"
-    height="350"
-    width="80"
-    allowDragging="true"
-    returnToOriginalPositionWhenReleased="false"
-    rectAlignment="UpperLeft"
-    offsetXY="80 0"
-    >
-    <Button
-        text="clear"
-        onClick="clearBoard"
-        color="red"
-        textColor="white"
+    <Button id="minUI" class="minimize"
+        active="false" onClick="openUI"
+        width="120" height="40"
+        rectAlignment="MiddleLeft"
+        offsetXY="10 30"
+        allowDragging="true"
+        returnToOriginalPositionWhenReleased="false"
         >
+        Open Menu
     </Button>
-    <Button text="place&#10;small" id="0" class="basic" > </Button>
-    <Button text="place&#10;medium" id="1" class="basic" > </Button>
-    <Button text="place&#10;large" id="2" class="basic" > </Button>
-</VerticalLayout>
 
-
-
-<!-- Dice Roller UI Elements -->
+    <TableLayout id="window"
+        width="512"
+        height="240"
+        rectAlignment="UpperLeft"
+        offsetXY="60 -60"
+        cellBackgroundColor="#F0E5BF40"
+        cellBackgroundImage=""
+        allowDragging="true"
+        returnToOriginalPositionWhenReleased="false"
+        >
+        <Row preferredHeight="40">
+            <Cell class="title_block">
+                <Panel color="#F0DC9C">
+                    <Text class="h1">
+                        Catan Board Setup
+                    </Text>
+                    <Button class="close" onClick="minimizeUI"/>
+                </Panel>
+            </Cell>
+        </Row>
+        <Row class="menu1">
+            <Cell>
+                <VerticalLayout childForceExpandHeight="false" padding="15 10 10 10">
+                    <Text class="h2" alignment="UpperLeft">
+                        Number of Players
+                    </Text>
+                    <ToggleGroup id="numPlayers" onValueChanged="updateUserSettins">
+                        <VerticalLayout>
+                            <Toggle>3-4</Toggle>
+                            <Toggle>5 (coming soon)</Toggle>
+                            <Toggle>6 (coming soon)</Toggle>
+                        </VerticalLayout>
+                    </ToggleGroup>
+                </VerticalLayout>
+            </Cell>
+            <Cell>
+                <VerticalLayout childForceExpandHeight="false" padding="15 10 10 10">
+                    <Text class="h2" alignment="UpperLeft">
+                        Board Configuration
+                    </Text>
+                    <ToggleGroup id="boardConfig" onValueChanged="updateUserSettins">
+                        <VerticalLayout>
+                            <Toggle>Random</Toggle>
+                            <Toggle>Balanced</Toggle>
+                            <Toggle>Beginner (coming soon)</Toggle>
+                        </VerticalLayout>
+                    </ToggleGroup>
+                </VerticalLayout>
+            </Cell>
+        </Row>
+        <Row class="menu1" preferredHeight="40" >
+            <Cell columnSpan="2">
+                <HorizontalLayout padding="10 0 0 0">
+                    <Text alignment="UpperLeft" fontStyle="bold">
+                        Balanced board generation <i>may</i> fail. These are known problems.
+                        If it does, just reset using the button below and try again.
+                    </Text>
+                </HorizontalLayout>
+            </Cell>
+        </Row>
+        <Row class="menu1" preferredHeight="40" >
+            <Cell columnSpan="2">
+                <HorizontalLayout padding="10 10 0 5" spacing="10">
+                    <Button color="white" textColor="black" text="Generate" onClick="generate"/>
+                    <Button color="red" textColor="white" text="Clear Board" onClick="clearBoard"/>
+                </HorizontalLayout>
+            </Cell>
+        </Row>
+    </TableLayout>
+</XmlLayout>

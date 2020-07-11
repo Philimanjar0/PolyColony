@@ -6,6 +6,10 @@ WHEAT = 3
 ORE = 4
 DESERT = 5
 
+ROAD = 7
+SETTLEMENT = 8
+CITY = 9
+
 resources_small = {
     WOOD,
     WOOD,
@@ -26,6 +30,12 @@ resources_small = {
     SHEEP,
     SHEEP,
     DESERT
+}
+
+player_pieces = {
+    ROAD, ROAD, ROAD, ROAD, ROAD, ROAD, ROAD, ROAD, ROAD, ROAD, ROAD, ROAD,
+    ROAD, ROAD, ROAD, SETTLEMENT, SETTLEMENT, SETTLEMENT, SETTLEMENT, SETTLEMENT,
+    CITY, CITY, CITY, CITY
 }
 
 probabilities_small = {
