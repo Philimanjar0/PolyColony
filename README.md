@@ -1,4 +1,4 @@
-# Complete-Catan
-Complete Catan for Tabletop Simulator. Contain assets, scripts, models, etc.
+# PolyColony
+Complete board game for Tabletop Simulator. Contain assets, scripts, models, etc. 
 
-Test push
+Not at all affiliated with Settlers of Catan
