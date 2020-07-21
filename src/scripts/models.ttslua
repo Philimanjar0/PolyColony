@@ -1,0 +1,233 @@
+tileParams = {}
+tileParams.type = 'Custom_Model'
+tileParams.sound = false
+
+deckParams = {}
+deckParams.type = 'DeckCustom'
+deckParams.sound = false
+
+probabilityParams = {}
+probabilityParams.type = 'Custom_Tile'
+probabilityParams.sound = false
+
+desert = {}
+desert.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024187679/3C55E15243E442CB7FE11A177D8BCA7B3E6EFC0D/"
+desert.diffuse = "http://cloud-3.steamusercontent.com/ugc/1335831000024188917/D4892B5744FA824672D136D6E4B4F8E255053F84/"
+desert.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024187679/3C55E15243E442CB7FE11A177D8BCA7B3E6EFC0D/"
+desert.use_snap_points = false
+desert.convex = false
+desert.specular_intensity = 0.2
+desert.specular_sharpness = 4.0
+desert.fresnel_strength = 0.5
+
+ocean = {}
+ocean.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024298981/D689F05B691A8C799BAA671E6B4FF48F17C3D7EE/"
+ocean.diffuse = "http://cloud-3.steamusercontent.com/ugc/1335831000024299262/521B3FD30EB3DF1DE9C45358A3ABE3E2C72CABCA/"
+ocean.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024298981/D689F05B691A8C799BAA671E6B4FF48F17C3D7EE/"
+ocean.use_snap_points = false
+ocean.convex = false
+ocean.specular_intensity = 0.2
+ocean.specular_sharpness = 4.0
+ocean.fresnel_strength = 0.5
+
+clay = {}
+clay.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024273304/8A982FE55794E132E12D615A9AB31ED046770D9B/"
+clay.diffuse = "http://cloud-3.steamusercontent.com/ugc/1335831000024273998/95637E66ACD674CE525AE5A6460D281CFC8011BA/"
+clay.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024273304/8A982FE55794E132E12D615A9AB31ED046770D9B/"
+clay.use_snap_points = false
+clay.convex = false
+clay.specular_intensity = 0.2
+clay.specular_sharpness = 4.0
+clay.fresnel_strength = 0.5
+
+wheat = {}
+wheat.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024279721/EE552F85E140F9A39BA9346BBD2938ABB7B66101/"
+wheat.diffuse = "http://cloud-3.steamusercontent.com/ugc/1335831000024280183/CE49B46FDD6023E0976BA9BE4DB87B69E50F8AB5/"
+wheat.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024279721/EE552F85E140F9A39BA9346BBD2938ABB7B66101/"
+wheat.use_snap_points = false
+wheat.convex = false
+wheat.specular_intensity = 0.2
+wheat.specular_sharpness = 4.0
+wheat.fresnel_strength = 0.5
+
+wood = {}
+wood.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024287400/B61DF3048A40EDDD38CD0C65F52B8FAF78C6DE02/"
+wood.diffuse = "http://cloud-3.steamusercontent.com/ugc/1335831000024287976/DBA63F3F385A02B9C715BE1A09D6617C94407844/"
+wood.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024287400/B61DF3048A40EDDD38CD0C65F52B8FAF78C6DE02/"
+wood.use_snap_points = false
+wood.convex = false
+wood.specular_intensity = 0.2
+wood.specular_sharpness = 4.0
+wood.fresnel_strength = 0.5
+
+ore = {}
+ore.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024292027/D3A767D360F8D7C6AC327C65223BABE4CA7742B0/"
+ore.diffuse = "http://cloud-3.steamusercontent.com/ugc/1335831000024294070/52ADBE4CBDBC0C2D4FB3082B911730A3EDFBE814/"
+ore.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024292027/D3A767D360F8D7C6AC327C65223BABE4CA7742B0/"
+ore.use_snap_points = false
+ore.convex = false
+ore.specular_intensity = 0.2
+ore.specular_sharpness = 4.0
+ore.fresnel_strength = 0.5
+
+sheep = {}
+sheep.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024300472/FAF46CA0D966E8428D1D72917820C9E16097FD40/"
+sheep.diffuse = "http://cloud-3.steamusercontent.com/ugc/1335831000024301908/CD7CA98866DBBEE8D465C4D04CC243458B5658F4/"
+sheep.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024300472/FAF46CA0D966E8428D1D72917820C9E16097FD40/"
+sheep.use_snap_points = false
+sheep.convex = false
+sheep.specular_intensity = 0.2
+sheep.specular_sharpness = 4.0
+sheep.fresnel_strength = 0.5
+
+resourceDeck = {}
+resourceDeck.face = "http://cloud-3.steamusercontent.com/ugc/1335831000024134198/E917200B58D39E323ED94356099A82BCCBE65E46/"
+resourceDeck.back = "http://cloud-3.steamusercontent.com/ugc/1335831000024138414/FF5B05E05F2B90FA4B5EDA694E950C6477D5DB9B/"
+resourceDeck.width = 3
+resourceDeck.height = 2
+resourceDeck.number = 5
+
+developementDeck = {}
+developementDeck.face = "http://cloud-3.steamusercontent.com/ugc/1335831000023978091/C8A8A0AC1F00C65CB92910F7C383F142B8535FEB/"
+developementDeck.back = "http://cloud-3.steamusercontent.com/ugc/1335831000024127293/443E71DB57DF06453822552B4FC249DB1DA4822E/"
+developementDeck.width = 6
+developementDeck.height = 5
+developementDeck.number = 25
+
+port = {}
+port.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024341748/5935F0EBC4B17553F6EDDA3BF1F0D4116C5A8265/"
+port.diffuse = "http://cloud-3.steamusercontent.com/ugc/1335831000024342113/CEBD31B0A08A3F924C6A628A9E6E984B4D330A3A/"
+port.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024341748/5935F0EBC4B17553F6EDDA3BF1F0D4116C5A8265/"
+port.use_snap_points = false
+port.convex = false
+port.specular_intensity = 0.2
+port.specular_sharpness = 4.0
+port.fresnel_strength = 0.5
+
+probabilityCustom = {}
+probabilityCustom.image = ""
+probabilityCustom.type = 2
+probabilityCustom.thickness = 0.05
+probabilityCustom.stackable = true
+
+probabilityImages = {
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024321904/31C5444D77AABC9625722DA3E02C5339CA767D40/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024323290/4A55255A396B5D5D40FB1786F108FC5E618AF7BC/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024325843/F338890AE79E59935BB9151FE5388670C64E3E69/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024326717/502F4642F0662C833E6691FC09D7E47E4EB6FC86/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024325000/CD9CC62D01C4650127A797B1D0FC3641D3513CBA/",
+"http://cloud-3.steamusercontent.com/ugc/1335831000024328234/BF1E459F983DCFE4FDE9E609E13117348102B2E6/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024325408/F41EEF72E42F5EDE738EB0B58F8BA11883DB9645/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024323783/F77678255B61C874CF5AB372148925E34FB0A590/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024327470/42ED02F72BDABE5678C017F435CC32A85D0720D8/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024322838/96400AAF87A0139343517127CED177B0B5EDFE8E/"
+}
+
+probabilityNicknames = {
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+}
+
+tradeCustom = {}
+tradeCustom.image = ""
+tradeCustom.type = 3
+tradeCustom.thickness = 0.05
+
+tradeTokenImages = {
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024340883/DA605ABB916C6CF21AF879F035C298E689C2601B/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024337892/315D03809D3A1FB57E928186683839E9618D34A8/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024339690/0CF5AA5CA7303AE72CEA99C78CBF1943FCD0FEC7/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024340206/C2ED9784760BC13686490822ED4585BE51F1D637/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024338375/AB749BD997A0B7CD000E1362DC2B1B15493373E1/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024337443/EA0CB27DDF0A2CC3F0B61667363F2B6071F84B13/"
+}
+
+tradeTokenNicknames = {
+    "2:1 wood",
+    "2:1 brick",
+    "2:1 sheep",
+    "2:1 wheat",
+    "2:1 ore",
+    "3:1 any"
+}
+
+tableObjectParams = {}
+tableObjectParams.type = 'Custom_Model'
+tableObjectParams.sound = false
+
+tableAssets = {}
+tableAssets.mesh = 'http://cloud-3.steamusercontent.com/ugc/1335831000024312004/1025D8D570467673DDDBB15511F17DEC12BF578D/'
+tableAssets.diffuse = 'http://cloud-3.steamusercontent.com/ugc/1335831000024313991/20259CECE5FA4B3D7480C4AB4B5C1AD8DEE1B08C/'
+tableAssets.material = 1--wood
+
+bumperAssets = {}
+bumperAssets.mesh='http://cloud-3.steamusercontent.com/ugc/1335831000024311490/8F1E89F8CF16BCF5ED947FC21BE4EC8EBE4AF988/'
+bumperAssets.collider='http://cloud-3.steamusercontent.com/ugc/1335831000024311490/8F1E89F8CF16BCF5ED947FC21BE4EC8EBE4AF988/'
+bumperAssets.diffuse='http://cloud-3.steamusercontent.com/ugc/1335831000024313991/20259CECE5FA4B3D7480C4AB4B5C1AD8DEE1B08C/'
+bumperAssets.convex=false
+bumperAssets.material=1--wood
+
+settlementAssets = {}
+settlementAssets.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024362605/97D08FB42876432CD5EB05D5314B19E75BCACEF4/"
+settlementAssets.diffuse = ""
+settlementAssets.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024362605/97D08FB42876432CD5EB05D5314B19E75BCACEF4/"
+settlementAssets.use_snap_points = true
+settlementAssets.specular_intensity = 0.2
+settlementAssets.specular_sharpness = 4.0
+settlementAssets.fresnel_strength = 0.5
+
+cityAssets = {}
+cityAssets.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024392123/490BB6C513BD02ED345E6D0D3B35775FF3746A14/"
+cityAssets.diffuse = ""
+cityAssets.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024392123/490BB6C513BD02ED345E6D0D3B35775FF3746A14/"
+cityAssets.use_snap_points = true
+cityAssets.specular_intensity = 0.2
+cityAssets.specular_sharpness = 4.0
+cityAssets.fresnel_strength = 0.5
+
+roadAssets = {}
+roadAssets.mesh = "http://cloud-3.steamusercontent.com/ugc/1335831000024379076/5098D3C0A88429F3E899A047E6C56B38F507485A/"
+roadAssets.diffuse = ""
+roadAssets.collider = "http://cloud-3.steamusercontent.com/ugc/1335831000024379076/5098D3C0A88429F3E899A047E6C56B38F507485A/"
+roadAssets.use_snap_points = true
+roadAssets.specular_intensity = 0.2
+roadAssets.specular_sharpness = 4.0
+roadAssets.fresnel_strength = 0.5
+
+
+player_piece_diffuse = {}
+local_road_diffuse_base = "E:/Complete_Catan/out/road/road_"
+local_settlement_diffuse_base = "E:/Complete_Catan/out/settlement/settlement_"
+local_city_diffuse_base = "E:/Complete_Catan/out/city/city_"
+player_piece_diffuse.road = {
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024386233/A7BECAEA902794CF6636BBFF2A26B69ACB055339/", --white
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024385537/14F1E93241007A21E79D2E4E8AEED97A80B21310/", --red
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024387200/324A0FF6B7474671C306E6B476386DD2E014DE0E/", --yellow
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024381709/1D50B250B069887B8AB1B30164B154A25C1E2FFF/", --green
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024381116/362309E304D193F4AF1A9ACC5A5C558F74003FDD/", --blue
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024384171/F6ECF9123019A04AAF4676CAE4C84E73253F99B3/", --purple
+}
+player_piece_diffuse.settlement = {
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024373297/FC9AEB38CE960866BB7399EDE52E197E005D4CEB/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024366901/5879FCE9288B32809059EA5629E3E8A839456E60/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024374170/09354DDACCDD237A6326D1B7BC711B2F469429DD/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024365636/C6CE2532FE371EFBBDA7470C9519A4BE924D714C/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024365139/5C04B2B20E32A2C1C21029C60AEA5F55FB198EA4/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024366494/0A121E0B2CF8A21DD5565820DD54E7882D9B9DA9/",
+}
+player_piece_diffuse.city = {
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024396843/0BA3A65B3C96A6FE224AC389FCC9F15CE6BADA08/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024395590/8B4EE8E0C20157CA12437ED937755CE006D05A33/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024397399/D578FB70B4FB924D8EE785057F66A31BBB0B7B3F/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024393331/11CD80D58D007A8903E6ECDEA5F013EAAE2D9B80/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024392867/DD1713FFD71136397032FB49DC5AE2372969E3B9/",
+    "http://cloud-3.steamusercontent.com/ugc/1335831000024394547/2328830439E8050B459284057DC13C2C4EA74550/",
+}
