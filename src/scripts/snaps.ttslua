@@ -1,0 +1,99 @@
+-- snap point locations and rotations for roads
+-- one for each edge of each tile, aligned to face the direction of edge
+tileSnap = {
+    {
+        position = {2,0.1,0},
+        rotation = {0,90,0},
+        rotation_snap = true
+    },
+    {
+        position = {-2,0.1,0},
+        rotation = {0,90,0},
+        rotation_snap = true
+    },
+    {
+        position = {1,0.1,1.725},
+        rotation = {0,30,0},
+        rotation_snap = true
+    },
+    {
+        position = {-1,0.1,1.725},
+        rotation = {0,-30,0},
+        rotation_snap = true
+    },
+    {
+        position = {-1,0.1,-1.725},
+        rotation = {0,-150,0},
+        rotation_snap = true
+    },
+    {
+        position = {1,0.1,-1.725},
+        rotation = {0,-210,0},
+        rotation_snap = true
+    },
+    -- snap point locations and rotations for intersections
+    -- one for each corner, aligned with edges
+    {
+        position = {2,0.1,1.15},
+        rotation = {0,120,0},
+        rotation_snap = true
+    },
+    {
+        position = {-2,0.1,1.15},
+        rotation = {0,0,0},
+        rotation_snap = true
+    },
+    {
+        position = {-2,0.1,-1.15},
+        rotation = {0,-60,0},
+        rotation_snap = true
+    },
+    {
+        position = {2,0.1,-1.15},
+        rotation = {0,180,0},
+        rotation_snap = true
+    },
+    {
+        position = {0,0.1,2.3},
+        rotation = {0,60,0},
+        rotation_snap = true
+    },
+    {
+        position = {0,0.1,-2.3},
+        rotation = {0,-120,0},
+        rotation_snap = true
+    }
+}
+
+-- snap points for each tiles number podium
+-- each tile has a unique location for podium
+-- snap points are at center of each podium for number tile
+resource_spec_snaps = {
+    --wood
+    {{position = {-0.973, 0.329, 0.482}}}, --adjusted y value to fix strange collision, original 0.329
+    --brick
+    {{position = {-0.235,0.476,1.262}}},
+    --sheep
+    {{position = {0.851, 0.583, -0.767}}},
+    --wheat
+    {{position = {0.778,0.23,0.887}}}, --adjusted y value to fix strange collision, original 0.218
+    --ore
+    {{position = {-0.746, 0.383, -0.616}}},
+    --desert
+    {{position = {0.876,0.38,0.439}}}
+
+}
+
+portSnap = {}
+portSnap.position = {-0.493, 0.36, 0.927}
+portSnap.rotation = {0,30,0}
+
+player_piece_locations = {
+    {-2,0,2}, {-2,0,1}, {-2,0,0}, {-2,0,-1}, {-2,0,-2},
+    {-1,0,2}, {-1,0,1}, {-1,0,0}, {-1,0,-1}, {-1,0,-2},
+    {0,0,2}, {0,0,1}, {0,0,0}, {0,0,-1}, {0,0,-2},
+    {1,0,2}, {1,0,1}, {1,0,0}, {1,0,-1}, {1,0,-2},
+    {2,0,2}, {2,0,1}, {2,0,0}, {2,0,-1}
+}
+
+print('snap points imported')
