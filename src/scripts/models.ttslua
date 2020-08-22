@@ -81,9 +81,9 @@ sheep.specular_sharpness = 4.0
 sheep.fresnel_strength = 0.5
 
 resourceDeck = {}
-resourceDeck.face = "http://cloud-3.steamusercontent.com/ugc/1335831000024134198/E917200B58D39E323ED94356099A82BCCBE65E46/"
-resourceDeck.back = "http://cloud-3.steamusercontent.com/ugc/1335831000024138414/FF5B05E05F2B90FA4B5EDA694E950C6477D5DB9B/"
-resourceDeck.width = 3
+resourceDeck.face = "http://cloud-3.steamusercontent.com/ugc/1475444535614226298/36834D0BD565BE6B2CC577C71B7604AB61FF349E/"
+resourceDeck.back = "http://cloud-3.steamusercontent.com/ugc/1475444535614271079/9B65A843A6E51DA950BB1D72FA899169AD92D630/"
+resourceDeck.width = 4
 resourceDeck.height = 2
 resourceDeck.number = 5
 
