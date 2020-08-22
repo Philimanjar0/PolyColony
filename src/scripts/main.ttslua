@@ -86,7 +86,7 @@ function onSave()
 end
 
 function onLoad(saved_data)
-
+    print("test")
 end
 
 
