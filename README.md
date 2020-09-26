@@ -1,4 +1,5 @@
-# Complete-Catan
-Complete Catan for Tabletop Simulator. Contain assets, scripts, models, etc.
+# PolyColony
 
-Test push
+Tabletop Simulator mod. Contains assets and scripts
+
+real documentation is part of issue #25
