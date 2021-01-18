@@ -1,0 +1,85 @@
+-- Most of this is ripped from the ge_tts demo project, will be fixing later to be what I need.
+-- There is a lot of lunalysis stuff left over that I don't use, but im keeping it for now.
+local Instance = require('ge_tts.Instance')
+local TableUtils = require('ge_tts.TableUtils')
+
+local CardInstance = {}
+
+-- Set an instance type. For readability, not used by ge_tts.
+CardInstance.INSTANCE_TYPE = "Card"
+
+setmetatable(CardInstance, TableUtils.merge(getmetatable(Instance), {
+    --- Here is on constructor, the type definition is a bit complicated, it's
+    --- the combination of all three of our overloads!
+    ---@param cardOrSavedState Card | CardInstance_SavedState
+    ---@param nilOrObjectOrGuid nil | tts__Object | string
+    ---@param nilOrContainer nil | tts__Container
+    __call = function(_, cardOrSavedState, nilOrObjectOrGuid, nilOrContainer)
+        -- Here we check whether we've been passed a saved state.
+        local isSavedState = CardInstance.isSavedState(cardOrSavedState)
+
+        --
+        -- If we have, we pass that to our super constructor Instance(), otherwise
+        -- we pass on the object GUID (guaranteed to not be nil at this point), and
+        -- the container (which may be nil, if the card isn't in a container).
+        --
+        -- NOTE: We're casting from ge_tts__Instance to CardInstance, because
+        --       we're about to add all the fields for a CardInstance onto it.
+        --
+        local self = --[[---@type CardInstance]] (
+            isSavedState and Instance(--[[---@type CardInstance_SavedState]] cardOrSavedState)
+                or Instance(--[[---@not nil]] nilOrObjectOrGuid, nilOrContainer)
+        )
+
+        -- Store the data having to do with this specific card instance.
+        ---@type Card
+        local card
+
+        -- Expose card getter
+        ---@return Card
+        function self.getCard()
+            return card
+        end
+
+        -- Finally, we *override* save(). It's *very* important how we go about doing this. We must
+        -- return our own data, but also return ge_tts__Instance. This is achieved by first grabbing
+        -- a reference this existing save() method ge_tts__Instance...
+
+        local superSave = self.save
+
+        -- Then, we replace this method with our own implementation...
+
+        ---@return CardInstance_SavedState
+        function self.save()
+            -- ge_tts__Instance (our super class) has its own data that it needs to save. So we call
+            -- through to the original (super) save() method, and merge its result with our own data
+            -- i.e. the card data (from our card library) associated with this instance.
+
+            return --[[---@type CardInstance_SavedState]] TableUtils.merge(superSave(), {
+                card = card,
+            })
+        end
+
+        if isSavedState then
+            -- If we're restoring from a saved state, we restore the card data from the saved state.
+
+            local data = --[[---@type CardInstance_SavedState]] cardOrSavedState
+            card = data.card
+        else
+            -- If not, then we know this constructor was called with the necessary card data, thus
+            -- we cast it: --[[---@type Card]]
+            card = --[[---@type Card]] cardOrSavedState
+            -- Again, this cast business is just for the Luanalysis IDE, if you just want to use
+            -- Atom and don't care about static typing your code, you can omit these comments.
+        end
+
+        return self
+    end,
+
+    -- As stated above, for convenience we make all methods provided by Instance available on
+    -- CardInstance. Actually, you'l note we already took advantage of this fact in our
+    -- constructor, where we used CardInstance.isSavedState instead of Instance.isSavedState.
+    __index = Instance,
+}))
+
+return CardInstance
