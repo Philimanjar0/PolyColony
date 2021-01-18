@@ -1,0 +1,67 @@
+local CardType = require('polycolony.CardType')
+
+-- TODO fix HACK the image Url's will need to be pull from steam or git or somewhere
+local Cards = {
+    {
+        name = 'Wheat',
+        type = CardType.RESOURCE,
+        imageUrl = 'E:/polycolony/out/cardFaces/dev/devBack.png'
+    },
+    {
+        name = 'Sheep',
+        type = CardType.RESOURCE,
+        imageUrl = ''
+    },
+    {
+        name = 'Ore',
+        type = CardType.RESOURCE,
+        imageUrl = ''
+    },
+    {
+        name = 'Brick',
+        type = CardType.RESOURCE,
+        imageUrl = ''
+    },
+    {
+        name = 'Wood',
+        type = CardType.RESOURCE,
+        imageUrl = ''
+    },
+    {
+        name = 'Knight',
+        type = CardType.DEVELOPEMENT,
+        imageUrl = ''
+    },
+    {
+        name = 'Monopoly',
+        type = CardType.DEVELOPEMENT,
+        imageUrl = ''
+    },
+    {
+        name = 'Road Building',
+        type = CardType.DEVELOPEMENT,
+        imageUrl = ''
+    },
+    {
+        name = 'Year Of Plenty',
+        type = CardType.DEVELOPEMENT,
+        imageUrl = ''
+    },
+    {
+        name = 'District',
+        type = CardType.DEVELOPEMENT,
+        imageUrl = ''
+    },
+    {
+        name = 'Longest Road',
+        type = CardType.ACHEIVEMENT,
+        imageUrl = ''
+    },
+    {
+        name = 'Largest Army',
+        type = CardType.ACHEIVEMENT,
+        imageUrl = ''
+    },
+}
+
+return Cards

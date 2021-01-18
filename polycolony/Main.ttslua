@@ -1,0 +1,53 @@
+-- ge_tts objects to be used for saving, loading, and generally setting up.
+local SaveManager = require('ge_tts.SaveManager')
+local JSON = require('ge_tts.json')
+local TableUtils = require('ge_tts.TableUtils')
+local ObjectUtils = require('ge_tts.ObjectUtils')
+
+-- Implemented custom classes for card spawning
+local CardInstance = require('polycolony.CardInstance')
+local CardLibrary = require('polycolony.CardLibrary')
+local CardType = require('polycolony.CardType')
+local CardUtils = require('polycolony.CardUtils')
+
+
+
+-- Table to keep track of instances and zones
+local cardInstances = {}
+
+local function onLoad(state)
+    local isBlankSave = state == ''
+
+    if isBlankSave then
+        -- We have no save and we are loading for the first time.
+        local card = CardLibrary[1]
+        local cardState = CardUtils.cardState(card, {0, 5, 0})
+
+        local cardObject = ObjectUtils.safeSpawnObject(cardState)
+        local cardInstance = CardInstance(card, cardObject)
+
+        table.insert(cardInstances, cardInstance)
+    else
+        -- We need to restore the save game.
+        local savedState = JSON.decode(state)
+
+        for _, cardSavedState in ipairs(savedState.cardInstances) do
+            local instance = CardInstance(cardSavedState)
+            -- Keep track of the instance we just created
+            table.insert(cardInstances, instance)
+        end
+    end
+end
+
+local function onSave()
+    local savedState = {
+        cardInstances = TableUtils.map(cardInstances, function(cardInstance)
+            return cardInstance.save()
+        end)
+    }
+
+    return JSON.encode(savedState)
+end
+
+SaveManager.registerOnLoad('E:/polycolony/polycolony.Main', onLoad)
+SaveManager.registerOnSave('E:/polycolony/polycolony.Main', onSave)

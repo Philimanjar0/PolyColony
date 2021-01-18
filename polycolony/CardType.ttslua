@@ -1,0 +1,13 @@
+-- Defining a table of card types to be returned and used by other files.
+
+-- RESOURCE are resource cards ie brick, ore, etc.
+-- DEVELOPEMENT are developement cards ie knight
+-- ACHEIVEMENT are acheivment cards that award victory points, longest road or largest army
+
+local CardType = {
+    RESOURCE = "resource",
+    DEVELOPEMENT = "developement",
+    ACHEIVEMENT = "acheivement"
+}
+
+return CardType
