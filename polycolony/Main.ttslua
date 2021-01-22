@@ -20,15 +20,19 @@ local function onLoad(state)
 
     if isBlankSave then
         -- We have no save and we are loading for the first time.
-        local card = CardLibrary[1]
-        local cardState = CardUtils.cardState(card, {0, 5, 0})
+        -- TODO actually do something here, good enough as proof of concept
+        for _,card in pairs(CardLibrary) do
+            -- Just a test for loop to load one of each resource type. Just spawns some stuff
+            if card.type == CardType.RESOURCE then
+                local cardState = CardUtils.cardState(card, {0, 5, 0})
+                local cardObject = ObjectUtils.safeSpawnObject(cardState)
+                local cardInstance = CardInstance(card, cardObject)
 
-        local cardObject = ObjectUtils.safeSpawnObject(cardState)
-        local cardInstance = CardInstance(card, cardObject)
-
-        table.insert(cardInstances, cardInstance)
+                table.insert(cardInstances, cardInstance)
+            end
+        end
     else
-        -- We need to restore the save game.
+        --We need to restore the save game.
         local savedState = JSON.decode(state)
 
         for _, cardSavedState in ipairs(savedState.cardInstances) do
