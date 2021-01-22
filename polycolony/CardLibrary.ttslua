@@ -1,67 +1,69 @@
 local CardType = require('polycolony.CardType')
+local AssetLibrary = require('polycolony.CardAssetLibrary')
 
--- TODO fix HACK the image Url's will need to be pull from steam or git or somewhere
-local Cards = {
-    {
-        name = 'Wheat',
+local Cards = {}
+    -- name: the nickname that appears in the tool tip in game.
+    -- type: the CardType card type.
+    -- asset: the AssetType descriptor.
+    -- assetIndex: the (0 indexed) index on the deck image sheet.
+    -- TODO no support for any other card than just dev cards, keep going
+    Cards.WHEAT = {
+        name = 'Wheat', 
         type = CardType.RESOURCE,
-        imageUrl = 'E:/polycolony/out/cardFaces/dev/devBack.png'
-    },
-    {
+        asset = AssetLibrary.RESOURCE,
+        assetIndex = 3
+    }
+    Cards.SHEEP = {
         name = 'Sheep',
         type = CardType.RESOURCE,
-        imageUrl = ''
-    },
-    {
+        asset = AssetLibrary.RESOURCE,
+        assetIndex = 2
+    }
+    Cards.ORE = {
         name = 'Ore',
         type = CardType.RESOURCE,
-        imageUrl = ''
-    },
-    {
+        asset = AssetLibrary.RESOURCE,
+        assetIndex = 1
+    }
+    Cards.BRICK = {
         name = 'Brick',
         type = CardType.RESOURCE,
-        imageUrl = ''
-    },
-    {
+        asset = AssetLibrary.RESOURCE,
+        assetIndex = 0
+    }
+    Cards.WOOD = {
         name = 'Wood',
         type = CardType.RESOURCE,
-        imageUrl = ''
-    },
-    {
+        asset = AssetLibrary.RESOURCE,
+        assetIndex = 4
+    }
+    Cards.KNIGHT = {
         name = 'Knight',
         type = CardType.DEVELOPEMENT,
-        imageUrl = ''
-    },
-    {
+    }
+    Cards.MONOPOLY = {
         name = 'Monopoly',
         type = CardType.DEVELOPEMENT,
-        imageUrl = ''
-    },
-    {
+    }
+    Cards.ROAD_BUILDING = {
         name = 'Road Building',
         type = CardType.DEVELOPEMENT,
-        imageUrl = ''
-    },
-    {
+    }
+    Cards.YEAR_OF_PLENTY = {
         name = 'Year Of Plenty',
         type = CardType.DEVELOPEMENT,
-        imageUrl = ''
-    },
-    {
+    }
+    Cards.DISTRICT = {
         name = 'District',
         type = CardType.DEVELOPEMENT,
-        imageUrl = ''
-    },
-    {
+    }
+    Cards.LONGEST_ROAD = {
         name = 'Longest Road',
         type = CardType.ACHEIVEMENT,
-        imageUrl = ''
-    },
-    {
+    }
+    Cards.LARGEST_ARMY = {
         name = 'Largest Army',
         type = CardType.ACHEIVEMENT,
-        imageUrl = ''
-    },
-}
+    }
 
 return Cards

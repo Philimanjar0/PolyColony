@@ -1,0 +1,26 @@
+-- Descriptor of card assets to be used for building cards
+
+-- TODO fix the image Url's will need to be pull from steam or git or somewhere
+-- TODO upload assets to somewhere
+
+-- frontUrl: the url location for the sheet of card faces.
+-- backUrl: the url location for the sheet of card faces.
+-- rows: number of rows in the asset sheet.
+-- columns: number of columns in the asset sheet.
+
+local CardAssetLibrary = {
+    RESOURCE = {
+        frontUrl = "E:/polycolony/out/cardFaces/resources/resourceDeck.png",
+        backUrl = "E:/polycolony/out/cardFaces/resources/resourceBack.png",
+        rows = 3,
+        columns = 2
+    },
+    DEVELOPEMENT = {
+        frontUrl = "E:/polycolony/out/cardFaces/dev/devDeck.png",
+        backUrl = "E:/polycolony/out/cardFaces/dev/devBack.png",
+        rows = 3,
+        columns = 2
+    }
+}
+
+return CardAssetLibrary

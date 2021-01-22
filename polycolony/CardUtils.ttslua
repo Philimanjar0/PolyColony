@@ -1,22 +1,25 @@
-local Object = require('ge_tts.Object') -- ge_tts provides useful TTS constants
-local ObjectUtils = require('ge_tts.ObjectUtils') -- ... and some utilities
+local Object = require('ge_tts.Object')
+local ObjectUtils = require('ge_tts.ObjectUtils')
+local AssetLibrary = require('polycolony.CardAssetLibrary')
 
 -- We're going to be creating TTS (custom) card objects at runtime for each card in our card library.
 -- To do this we need to create a special representation of TTS card object that TTS knows how to
 -- spawn.
 
--- Traditionally, TTS expects you to use deck assets, multiple card images in one larger card
--- sheet image. However, you don't need to do this (many mods don't), so to keep things simple
--- we're just going to have one image per card. However, the way TTS represents this internally
--- is as a "deck of one card", so we will still need a unique deck ID per card...
-
 ---@type number
-local currentDeckId = 0
+local deckIdCounter = 0
 
----@return number
-local function nextDeckId()
-    currentDeckId = currentDeckId + 1
-    return currentDeckId
+local deckID = {}
+
+--- Returns a new unique ID for provided key value. Simply incremented by 1 for each new deck added.
+---@param key CardType
+---@return number unique ID
+local function getDeckID(key)
+    if (deckID.key == nil) then
+        deckIdCounter = deckIdCounter + 1
+        deckID.key = deckIdCounter
+    end
+    return deckID.key
 end
 
 -- We're just using this `CardUtils` table to group together methods pertaining to cards.
@@ -27,17 +30,17 @@ local CardUtils = {}
 ---@param position tts__VectorShape
 ---@return tts__CardCustomState
 function CardUtils.cardState(card, position)
-    local deckId = nextDeckId() -- Grab a unique deck ID for our card.
+    
+    -- Grab a unique deck ID for our card.
+    local deckId = getDeckID(card.type) 
     return {
-        -- Name is not really a name, it's the *type* of TTS object.
+        -- TTS object type.
         Name = Object.Name.CardCustom,
 
-        -- Nickname on the other hand is the name displayed in TTS UI i.e. our card name.
+        -- Nickname to be displayed in TTS tooltip.
         Nickname = card.name,
 
-        -- Unfortunately, object states use a different transform/vector representation than the
-        -- TTS Vector class. ge_tts provides a helper to generate a transform state from vector
-        -- components though.
+        -- ge_tts provides a helper to generate a transform state from vector
         Transform = ObjectUtils.transformState({
             position = position,
             rotation = {0, 180, 0},
@@ -46,23 +49,24 @@ function CardUtils.cardState(card, position)
 
         -- A card ID is a unique number per card "asset" in a mod. 100x the Deck ID + the card
         -- number (starting at zero) within the deck.
-        CardID = deckId * 100,
+        CardID = deckId * 100 + card.assetIndex,
 
         -- We also need to describe to TTS how a deck (in this case card) ought to be displayed.
         -- In this case, our card is part of a custom deck/
         CustomDeck = {
             -- Which custom deck?
             [tostring(deckId)] = { -- Note: Although deckIds are numbers, they're stored as strings.
-                FaceURL = card.imageUrl, -- The image URL for our card.
-                BackURL = card.imageUrl, -- We're creating a double-sided card
+                FaceURL = card.asset.frontUrl, -- The image URLs for our card.
+                BackURL = card.asset.backUrl, 
 
-                NumWidth = 1, -- This is the number of columns in the deck image (1, it's just one card)
-                NumHeight = 1, -- This is the number of rows in the deck image (again 1)
+                NumWidth = card.asset.rows, -- This is the number of columns in the deck image
+                NumHeight = card.asset.columns, -- This is the number of rows in the deck image
 
-                BackIsHidden = true, -- We'll use the back of the card when it's hidden... which ah, is the front of the card. So we won't be hiding it.
-                UniqueBack = false, -- Every card in this deck (just the one) has the same back.
+                BackIsHidden = false, -- We use a custom hidden card face.
+                UniqueBack = false, -- Every card in this deck has the same back.
             }
         }
+        
     }
 end
 
