@@ -3,11 +3,26 @@
 -- RESOURCE are resource cards ie brick, ore, etc.
 -- DEVELOPEMENT are developement cards ie knight
 -- ACHEIVEMENT are acheivment cards that award victory points, longest road or largest army
+---@alias CardType CardSubType
+---@alias CardSubType "wheat" | "brick" | "ore" | "wood" | "sheep"
 
-local CardType = {
-    RESOURCE = "resource",
-    DEVELOPEMENT = "developement",
-    ACHEIVEMENT = "acheivement"
+local CardType = {}
+
+CardType.RESOURCE = {
+    SUBTYPE = {}
+}
+CardType.RESOURCE.SUBTYPE.WHEAT = "wheat"
+CardType.RESOURCE.SUBTYPE.BRICK = "brick"
+CardType.RESOURCE.SUBTYPE.ORE = "ore"
+CardType.RESOURCE.SUBTYPE.WOOD = "wood"
+CardType.RESOURCE.SUBTYPE.SHEEP = "sheep"
+
+CardType.DEVELOPEMENT = {
+    SUBTYPE = {},
+}
+
+CardType.ACHEIVEMENT = {
+    SUBTYPE = {},
 }
 
 return CardType

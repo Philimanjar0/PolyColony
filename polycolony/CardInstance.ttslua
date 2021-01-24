@@ -41,6 +41,11 @@ setmetatable(CardInstance, TableUtils.merge(getmetatable(Instance), {
             return card
         end
 
+        ---@return string
+        function self.getType()
+            return CardInstance.INSTANCE_TYPE
+        end
+
         -- Finally, we *override* save(). It's *very* important how we go about doing this. We must
         -- return our own data, but also return ge_tts__Instance. This is achieved by first grabbing
         -- a reference this existing save() method ge_tts__Instance...

@@ -1,69 +1,76 @@
 local CardType = require('polycolony.CardType')
 local AssetLibrary = require('polycolony.CardAssetLibrary')
 
+---@shape Card
+---@field name string | CardSubType nickname that appears in the tool tip in game.
+---@field type CardType card type.
+---@field subtype nil | CardSubType the sub type. Null if there is no subtype i.e. developement cards.
+---@field asset AssetLibrary the asset descriptor.
+---@field assetIndex number the (0 indexed) index on the deck image sheet.
 local Cards = {}
-    -- name: the nickname that appears in the tool tip in game.
-    -- type: the CardType card type.
-    -- asset: the AssetType descriptor.
-    -- assetIndex: the (0 indexed) index on the deck image sheet.
     -- TODO no support for any other card than just dev cards, keep going
     Cards.WHEAT = {
-        name = 'Wheat', 
+        name = CardType.RESOURCE.SUBTYPE.WHEAT, 
         type = CardType.RESOURCE,
+        subtype = CardType.RESOURCE.SUBTYPE.WHEAT,
         asset = AssetLibrary.RESOURCE,
         assetIndex = 3
     }
     Cards.SHEEP = {
-        name = 'Sheep',
+        name = CardType.RESOURCE.SUBTYPE.SHEEP,
         type = CardType.RESOURCE,
+        subtype = CardType.RESOURCE.SUBTYPE.SHEEP,
         asset = AssetLibrary.RESOURCE,
         assetIndex = 2
     }
     Cards.ORE = {
-        name = 'Ore',
+        name = CardType.RESOURCE.SUBTYPE.ORE,
         type = CardType.RESOURCE,
+        subtype = CardType.RESOURCE.SUBTYPE.ORE,
         asset = AssetLibrary.RESOURCE,
         assetIndex = 1
     }
     Cards.BRICK = {
-        name = 'Brick',
+        name = CardType.RESOURCE.SUBTYPE.BRICK,
         type = CardType.RESOURCE,
+        subtype = CardType.RESOURCE.SUBTYPE.BRICK,
         asset = AssetLibrary.RESOURCE,
         assetIndex = 0
     }
     Cards.WOOD = {
-        name = 'Wood',
+        name = CardType.RESOURCE.SUBTYPE.WOOD,
         type = CardType.RESOURCE,
+        subtype = CardType.RESOURCE.SUBTYPE.WOOD,
         asset = AssetLibrary.RESOURCE,
         assetIndex = 4
     }
-    Cards.KNIGHT = {
-        name = 'Knight',
-        type = CardType.DEVELOPEMENT,
-    }
-    Cards.MONOPOLY = {
-        name = 'Monopoly',
-        type = CardType.DEVELOPEMENT,
-    }
-    Cards.ROAD_BUILDING = {
-        name = 'Road Building',
-        type = CardType.DEVELOPEMENT,
-    }
-    Cards.YEAR_OF_PLENTY = {
-        name = 'Year Of Plenty',
-        type = CardType.DEVELOPEMENT,
-    }
-    Cards.DISTRICT = {
-        name = 'District',
-        type = CardType.DEVELOPEMENT,
-    }
-    Cards.LONGEST_ROAD = {
-        name = 'Longest Road',
-        type = CardType.ACHEIVEMENT,
-    }
-    Cards.LARGEST_ARMY = {
-        name = 'Largest Army',
-        type = CardType.ACHEIVEMENT,
-    }
+    -- Cards.KNIGHT = {
+    --     name = 'Knight',
+    --     type = CardType.DEVELOPEMENT,
+    -- }
+    -- Cards.MONOPOLY = {
+    --     name = 'Monopoly',
+    --     type = CardType.DEVELOPEMENT,
+    -- }
+    -- Cards.ROAD_BUILDING = {
+    --     name = 'Road Building',
+    --     type = CardType.DEVELOPEMENT,
+    -- }
+    -- Cards.YEAR_OF_PLENTY = {
+    --     name = 'Year Of Plenty',
+    --     type = CardType.DEVELOPEMENT,
+    -- }
+    -- Cards.DISTRICT = {
+    --     name = 'District',
+    --     type = CardType.DEVELOPEMENT,
+    -- }
+    -- Cards.LONGEST_ROAD = {
+    --     name = 'Longest Road',
+    --     type = CardType.ACHEIVEMENT,
+    -- }
+    -- Cards.LARGEST_ARMY = {
+    --     name = 'Largest Army',
+    --     type = CardType.ACHEIVEMENT,
+    -- }
 
 return Cards
