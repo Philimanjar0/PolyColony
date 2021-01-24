@@ -3,10 +3,11 @@
 -- TODO fix the image Url's will need to be pull from steam or git or somewhere
 -- TODO upload assets to somewhere
 
--- frontUrl: the url location for the sheet of card faces.
--- backUrl: the url location for the sheet of card faces.
--- rows: number of rows in the asset sheet.
--- columns: number of columns in the asset sheet.
+---@shape AssetLibrary
+---@field frontUrl string the url location for the sheet of card faces.
+---@field backUrl string the url location for the sheet of card faces.
+---@field rows number rows (vertical) in the asset sheet.
+---@field columns number columns (horizontal) in the asset sheet.
 
 local CardAssetLibrary = {
     RESOURCE = {

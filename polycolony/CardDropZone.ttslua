@@ -1,0 +1,173 @@
+  
+local DropZone = require('ge_tts.DropZone')
+local Instance = require('ge_tts.Instance')
+local TableUtils = require('ge_tts.TableUtils')
+
+local CardInstance = require('polycolony.CardInstance')
+
+-- CardDropZone is a subclass of DropZone. We have a large number of cards, but they are all similar enough
+-- to use one class for all cards.
+---@class CardDropZone : ge_tts__DropZone
+
+
+-- Define how a CardDropZone is saved and restored.
+---@shape CardDropZone_SavedState : ge_tts__DropZone_SavedState
+---@field validType CardType | CardSubType
+
+
+---@class static_CardDropZone : ge_tts__static_DropZone
+---@overload fun(savedState: CardDropZone_SavedState): CardDropZone
+---@overload fun(position: tts__VectorShape, rotation: tts__VectorShape, scale: tts__VectorShape, cardType: CardType): CardDropZone
+local CardDropZone = {}
+
+-- Type identifier
+CardDropZone.ZONE_TYPE = "Card Drop Zone"
+
+--- Takes an array of ge_tts Instances, and the card type which is allowed. If any instances are
+--- not allowed, they're rejected i.e. pulled out of their container, and sent back to their
+--- previous zone.
+---@param instances ge_tts__Instance[]
+---@param validCardType CardType | CardSubType
+local function rejectInvalidInstances(instances, validCardType)
+    for _, instance in ipairs(instances) do
+        -- If the instance is not a card instance, or if it's a card instance of the wrong type
+        -- then we want to reject it.
+        if (--[[---@not nil]] instance).getType() ~= CardInstance.INSTANCE_TYPE
+            or ((--[[---@type CardInstance]] instance).getCard().type ~= validCardType
+            and instance.getCard().subtype ~= validCardType)
+        then
+            -- ge_tts' Instance class has a convenience function that makes it really easy to reject
+            -- an instance, even if that instance exists within a container. It knows how to pull an
+            -- object out of a container, and return it to where the container came from.
+            instance.reject()
+        end
+    end
+end
+
+setmetatable(CardDropZone, TableUtils.merge(getmetatable(DropZone), {
+    ---@param positionOrSavedState tts__VectorShape | CardDropZone_SavedState
+    ---@param nilOrRotation nil | tts__VectorShape
+    ---@param nilOrScale nil | tts__VectorShape
+    ---@param nilOrCardTypeOrSubType nil | CardType | CardSubType
+    __call = function(_, positionOrSavedState, nilOrRotation, nilOrScale, nilOrCardTypeOrSubType)
+        -- Call through to the DropZone parent constructor
+        local self = --[[---@type CardDropZone]] DropZone(positionOrSavedState, nilOrRotation, nilOrScale, nil)
+
+        -- Each card drop zone only allows one type (or subtype) of card.
+        ---@type CardType | CardSubType
+        local validType
+
+        -- Next we override (replace the super class') getZoneType(), and return our zone type.
+        function self.getZoneType()
+            return CardDropZone.ZONE_TYPE
+        end
+
+        -- Expose what type of cards this zone allows.
+        function self.getValidType()
+            return validType
+        end
+
+        local superSave = self.save
+
+        ---@return CardDropZone_SavedState
+        function self.save()
+            return --[[---@type CardDropZone_SavedState]] TableUtils.merge(superSave(), {
+                validType = validType,
+            })
+        end
+
+        -- All ge_tts DropZones have a filterObject() method. 
+        local superFilterObject = self.filterObject
+
+        --- Called when a player attempts to drop an object within this zone. The return value
+        --- indicates whether the zone wishes to accept, reject or ignore the object being dropped.
+        ---@param colorName tts__PlayerColor @Color of the TTS player that dropped the TTS object.
+        ---@param object tts__Object
+        ---@return ge_tts__Zone_FilterResult
+        function self.filterObject(colorName, object)
+            -- Before we do any game specific inspections, we call through to the super
+            -- implementation of filterObject. In the case of a drop zone, it has logic that knows
+            -- to ignore objects that are dropped at high speed i.e. the player was throwing the
+            -- object, not trying to drop it.
+            local filterResult = superFilterObject(colorName, object)
+
+            if filterResult ~= CardDropZone.FilterResult.ACCEPT then
+                -- The super class has indicated not to accept the object, so we won't..
+                return filterResult
+            end
+
+            -- We want to see if there are any CardInstance associated with the object being dropped.
+            -- If it's a single card, there'll be just the one, but if it's a deck being dropped,
+            -- there'll be several instances associated with the one object (deck).
+            local instances = Instance.getInstances(object)
+
+            if #instances == 0 then
+                -- If there's no instances associated with the object, it's something we don't know
+                -- about. We could handle this a number of ways, but we're simply going to ignore the
+                -- object, it won't be "sucked up" by this drop zone, but may proceed to fall.
+                return CardDropZone.FilterResult.REJECT
+            end
+
+            -- Great, if we made it here, there are Instances associated with the object. We'll
+            -- look through them to see if there's any cards of the right card type.
+
+            for _, instance in ipairs(instances) do
+                if (--[[---@not nil]] instance).getType() == CardInstance.INSTANCE_TYPE then
+                    -- Great it's an instance *and* we now know it's a CardInstance
+
+                    local cardInstance = --[[---@type CardInstance]] instance
+
+                    -- Let's see if it's the right card type.
+                    if cardInstance.getCard().subtype == validType or cardInstance.getCard().type == validType then
+                        -- It is! Let's accept the object.
+                        return CardDropZone.FilterResult.ACCEPT
+                    end
+                end
+            end
+
+            -- If we made it here, we didn't find a single card instance of the right card type
+            -- associated with the object being dropped, but we know what was dropped had instances
+            -- i.e. the object only contains cards of the *wrong* card type. That being the case
+            -- we're going to *reject* the object. Rejecting an object will return the object to its
+            -- previous zone or pickup location. Unlike ignoring, other intersecting zones will no
+            -- longer have a chance to handle the object being dropped.
+
+            return CardDropZone.FilterResult.FORCE_REJECT
+        end
+
+        local superOnDrop = self.onDrop
+
+        --- Called when a TTS object is being dropped within this DropZone i.e. the object was
+        --- accepted by filterObject.
+        ---@param colorName nil|tts__PlayerColor @Color of the TTS player that dropped the TTS object.
+        ---@param object tts__Object @The object that was dropped.
+        function self.onDrop(colorName, object)
+            -- If you were paying close attention to our filterObject implementation, you may have
+            -- noticed that we chose to accept any object with at least one card instance of the
+            -- correct card type. If a deck was dropped and it also contained cards of the wrong
+            -- card type, we use our convenience method to reject those individual cards.
+            rejectInvalidInstances(Instance.getInstances(object), validType)
+
+            -- Finally, we're going to call through to the super implementation of onDrop. In the case
+            -- of a drop zone, by default, onDrop will smoothly move the object to the center of the
+            -- zone and correctly orient it.
+            superOnDrop(colorName, object)
+        end
+
+        if CardDropZone.isSavedState(positionOrSavedState) then
+            -- When restoring from a saved that, we pull the card type out of our saved state.
+            local data = --[[---@type CardDropZone_SavedState]] positionOrSavedState
+            validType = data.validType
+        else
+            -- If not restoring from a saved state, then the nilOrCardType parameter must have been
+            -- specified, we know it's not nil.
+            validType = --[[---@not nil]] nilOrCardTypeOrSubType
+
+        end
+
+        return self
+    end,
+    __index = DropZone,
+}))
+
+return CardDropZone
