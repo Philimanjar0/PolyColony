@@ -18,8 +18,13 @@ CardType.RESOURCE.SUBTYPE.WOOD = "wood"
 CardType.RESOURCE.SUBTYPE.SHEEP = "sheep"
 
 CardType.DEVELOPEMENT = {
-    SUBTYPE = {},
+    SUBTYPE = {}
 }
+CardType.DEVELOPEMENT.SUBTYPE.KNIGHT = "knight"
+CardType.DEVELOPEMENT.SUBTYPE.YEAR_OF_PLENTY = "year of plenty"
+CardType.DEVELOPEMENT.SUBTYPE.ROAD_BUILDING = "road building"
+CardType.DEVELOPEMENT.SUBTYPE.MONOPOLY = "monopoly"
+CardType.DEVELOPEMENT.SUBTYPE.DISTRICT = "district"
 
 CardType.ACHEIVEMENT = {
     SUBTYPE = {},

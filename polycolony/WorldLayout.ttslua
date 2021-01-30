@@ -1,0 +1,43 @@
+---
+--- A measurement descriptor to get table 3D global position of the origins of
+--- DropZones, Player Hands, Game Board, etc.
+---
+
+
+local Vector2 = require('ge_tts.Vector2')
+local Vector3 = require('ge_tts.Vector3')
+
+---@type WorldLayout[]
+local GameSizeOrigins = {}
+GameSizeOrigins.SMALL = {
+    RESOURCE_CARDS = {
+        POSITION = {
+            x = -5,
+            y = 0,
+            z = -2.5
+        },
+        ROTATION = {
+            x = 0,
+            y = 90,
+            z = 0
+        }
+    },
+    DEVELOPEMENT_CARDS = {
+        POSITION = {
+            x = 0,
+            y = 0,
+            z = 0
+        },
+        ROTATION = {
+            x = 0,
+            y = 90,
+            z = 0,
+        }
+    }
+}
+
+
+GameSizeOrigins.MEDIUM = {}
+GameSizeOrigins.LARGE = {}
+
+return GameSizeOrigins

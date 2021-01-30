@@ -44,33 +44,43 @@ local Cards = {}
         asset = AssetLibrary.RESOURCE,
         assetIndex = 4
     }
-    -- Cards.KNIGHT = {
-    --     name = 'Knight',
-    --     type = CardType.DEVELOPEMENT,
-    -- }
-    -- Cards.MONOPOLY = {
-    --     name = 'Monopoly',
-    --     type = CardType.DEVELOPEMENT,
-    -- }
-    -- Cards.ROAD_BUILDING = {
-    --     name = 'Road Building',
-    --     type = CardType.DEVELOPEMENT,
-    -- }
-    -- Cards.YEAR_OF_PLENTY = {
-    --     name = 'Year Of Plenty',
-    --     type = CardType.DEVELOPEMENT,
-    -- }
-    -- Cards.DISTRICT = {
-    --     name = 'District',
-    --     type = CardType.DEVELOPEMENT,
-    -- }
-    -- Cards.LONGEST_ROAD = {
-    --     name = 'Longest Road',
-    --     type = CardType.ACHEIVEMENT,
-    -- }
-    -- Cards.LARGEST_ARMY = {
-    --     name = 'Largest Army',
-    --     type = CardType.ACHEIVEMENT,
-    -- }
+    Cards.KNIGHT = {
+        name = CardType.DEVELOPEMENT.SUBTYPE.KNIGHT,
+        type = CardType.DEVELOPEMENT,
+        asset = AssetLibrary.DEVELOPEMENT,
+        assetIndex = 1
+    }
+    Cards.MONOPOLY = {
+        name = CardType.DEVELOPEMENT.SUBTYPE.MONOPOLY,
+        type = CardType.DEVELOPEMENT,
+        asset = AssetLibrary.DEVELOPEMENT,
+        assetIndex = 2
+    }
+    Cards.ROAD_BUILDING = {
+        name = CardType.DEVELOPEMENT.SUBTYPE.ROAD_BUILDING,
+        type = CardType.DEVELOPEMENT,
+        asset = AssetLibrary.DEVELOPEMENT,
+        assetIndex = 3
+    }
+    Cards.YEAR_OF_PLENTY = {
+        name = CardType.DEVELOPEMENT.SUBTYPE.YEAR_OF_PLENTY,
+        type = CardType.DEVELOPEMENT,
+        asset = AssetLibrary.DEVELOPEMENT,
+        assetIndex = 4
+    }
+    Cards.DISTRICT = {
+        name = CardType.DEVELOPEMENT.SUBTYPE.DISTRICT,
+        type = CardType.DEVELOPEMENT,
+        asset = AssetLibrary.DEVELOPEMENT,
+        assetIndex = 0
+    }
+    Cards.LONGEST_ROAD = {
+        name = 'Longest Road',
+        type = CardType.ACHEIVEMENT,
+    }
+    Cards.LARGEST_ARMY = {
+        name = 'Largest Army',
+        type = CardType.ACHEIVEMENT,
+    }
 
 return Cards

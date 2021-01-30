@@ -1,0 +1,74 @@
+local WorldLayout = require('polycolony.WorldLayout')
+local CardInstance = require('polycolony.CardInstance')
+local CardLibrary = require('polycolony.CardLibrary')
+local CardType = require('polycolony.CardType')
+local CardUtils = require('polycolony.CardUtils')
+local TableUtils = require('ge_tts.TableUtils')
+local ObjectUtils = require('ge_tts.ObjectUtils')
+local CardDropZone = require('polycolony.CardDropZone')
+local DropZone = require('ge_tts.DropZone')
+
+
+local CardComponents = {}
+
+local function spawnCardOfType(cardType, origin, instances, dropZones, facing, numberOfCards)
+    -- Counter to space out cards properly
+    local i = -1
+    for _,card in pairs(CardLibrary) do
+        -- Just a test for loop to load one of each resource type. Just spawns some stuff
+        if card.type == cardType then
+            i = i + 1
+            --spawn the cards to a unique hidden position far away, they will be brought into their respective zones later
+            local cardState = CardUtils.cardState(card, {0, -10, 0})
+            local cardObject = ObjectUtils.safeSpawnObject(cardState)
+            local cardInstance = CardInstance(card, cardObject)
+            local position = origin.POSITION
+            local rotation = origin.ROTATION
+            table.insert(instances, cardInstance)
+            local cardDropZone,_ = TableUtils.detect(dropZones, 
+                function(v,k) return cardType == v.getValidType() end)
+            if cardDropZone == nil then
+                cardDropZone = CardDropZone({position.x + (position.x + (i * 2.2)) * math.cos(math.rad(rotation.y)), 
+                    position.y, position.z + (position.z + (i * 2.2)) * math.sin(math.rad(rotation.y))}, 
+                    {rotation.x, -1 * rotation.y + 180, rotation.z}, facing, {1, 5, 1}, card.subtype == nil and card.type or card.subtype)
+                table.insert(dropZones, cardDropZone)
+                local _,test = TableUtils.detect(CardDropZone, 
+                function(v,k) return card.type == v end) == {nil,nil}
+            else
+                table.insert(dropZones, cardDropZone)
+            end
+            cardDropZone.drop(nil, cardInstance.getObject())
+        end
+    end
+end
+
+setmetatable(CardComponents, {
+    ---@param worldLayout nil | GameSizeOrigin
+    __call = function(_,worldLayout)
+
+        self = {}
+
+        -- Table to keep track of instances and zones
+        ---@type CardInstance[]
+        local cardInstances = {}
+        ---@type CardDropZone[]
+        local cardDropZones = {}
+
+        ---@type CardInstance[]
+        function self.getCardInstances()
+            return cardInstances
+        end
+
+        ---@type CardDropZone[]
+        function self.getCardDropZones()
+            return cardDropZones
+        end
+
+       spawnCardOfType(CardType.RESOURCE, worldLayout.RESOURCE_CARDS, cardInstances, cardDropZones, DropZone.Facing.UP)
+       spawnCardOfType(CardType.DEVELOPEMENT, worldLayout.DEVELOPEMENT_CARDS, cardInstances, cardDropZones, DropZone.Facing.DOWN)
+    end
+})
+
+
+
+return CardComponents

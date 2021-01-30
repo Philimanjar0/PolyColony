@@ -49,10 +49,11 @@ setmetatable(CardDropZone, TableUtils.merge(getmetatable(DropZone), {
     ---@param nilOrRotation nil | tts__VectorShape
     ---@param nilOrScale nil | tts__VectorShape
     ---@param nilOrCardTypeOrSubType nil | CardType | CardSubType
-    __call = function(_, positionOrSavedState, nilOrRotation, nilOrScale, nilOrCardTypeOrSubType)
+    __call = function(_, positionOrSavedState, nilOrRotation, facing, nilOrScale, nilOrCardTypeOrSubType)
         -- Call through to the DropZone parent constructor
         local self = --[[---@type CardDropZone]] DropZone(positionOrSavedState, nilOrRotation, nilOrScale, nil)
 
+        self.setFacing(facing)
         -- Each card drop zone only allows one type (or subtype) of card.
         ---@type CardType | CardSubType
         local validType
