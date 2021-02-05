@@ -8,12 +8,12 @@ local AssetLibrary = require('polycolony.CardAssetLibrary')
 ---@field asset AssetLibrary the asset descriptor.
 ---@field assetIndex number the (0 indexed) index on the deck image sheet.
 local Cards = {}
-    -- TODO no support for any other card than just dev cards, keep going
     Cards.WHEAT = {
         name = CardType.RESOURCE.SUBTYPE.WHEAT, 
         type = CardType.RESOURCE,
         subtype = CardType.RESOURCE.SUBTYPE.WHEAT,
         asset = AssetLibrary.RESOURCE,
+        number = 20,
         assetIndex = 3
     }
     Cards.SHEEP = {
@@ -21,6 +21,7 @@ local Cards = {}
         type = CardType.RESOURCE,
         subtype = CardType.RESOURCE.SUBTYPE.SHEEP,
         asset = AssetLibrary.RESOURCE,
+        number = 20,
         assetIndex = 2
     }
     Cards.ORE = {
@@ -28,6 +29,7 @@ local Cards = {}
         type = CardType.RESOURCE,
         subtype = CardType.RESOURCE.SUBTYPE.ORE,
         asset = AssetLibrary.RESOURCE,
+        number = 20,
         assetIndex = 1
     }
     Cards.BRICK = {
@@ -35,6 +37,7 @@ local Cards = {}
         type = CardType.RESOURCE,
         subtype = CardType.RESOURCE.SUBTYPE.BRICK,
         asset = AssetLibrary.RESOURCE,
+        number = 20,
         assetIndex = 0
     }
     Cards.WOOD = {
@@ -42,36 +45,42 @@ local Cards = {}
         type = CardType.RESOURCE,
         subtype = CardType.RESOURCE.SUBTYPE.WOOD,
         asset = AssetLibrary.RESOURCE,
+        number = 20,
         assetIndex = 4
     }
     Cards.KNIGHT = {
         name = CardType.DEVELOPEMENT.SUBTYPE.KNIGHT,
         type = CardType.DEVELOPEMENT,
         asset = AssetLibrary.DEVELOPEMENT,
+        number = 14,
         assetIndex = 1
     }
     Cards.MONOPOLY = {
         name = CardType.DEVELOPEMENT.SUBTYPE.MONOPOLY,
         type = CardType.DEVELOPEMENT,
         asset = AssetLibrary.DEVELOPEMENT,
+        number = 2,
         assetIndex = 2
     }
     Cards.ROAD_BUILDING = {
         name = CardType.DEVELOPEMENT.SUBTYPE.ROAD_BUILDING,
         type = CardType.DEVELOPEMENT,
         asset = AssetLibrary.DEVELOPEMENT,
+        number = 2,
         assetIndex = 3
     }
     Cards.YEAR_OF_PLENTY = {
         name = CardType.DEVELOPEMENT.SUBTYPE.YEAR_OF_PLENTY,
         type = CardType.DEVELOPEMENT,
         asset = AssetLibrary.DEVELOPEMENT,
+        number = 2,
         assetIndex = 4
     }
     Cards.DISTRICT = {
         name = CardType.DEVELOPEMENT.SUBTYPE.DISTRICT,
         type = CardType.DEVELOPEMENT,
         asset = AssetLibrary.DEVELOPEMENT,
+        number = 5,
         assetIndex = 0
     }
     Cards.LONGEST_ROAD = {

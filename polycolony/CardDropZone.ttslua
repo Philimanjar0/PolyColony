@@ -2,8 +2,8 @@
 local DropZone = require('ge_tts.DropZone')
 local Instance = require('ge_tts.Instance')
 local TableUtils = require('ge_tts.TableUtils')
-
 local CardInstance = require('polycolony.CardInstance')
+local EventManager = require('ge_tts.EventManager')
 
 -- CardDropZone is a subclass of DropZone. We have a large number of cards, but they are all similar enough
 -- to use one class for all cards.
@@ -58,6 +58,10 @@ setmetatable(CardDropZone, TableUtils.merge(getmetatable(DropZone), {
         ---@type CardType | CardSubType
         local validType
 
+        -- Each drop zone should have only one 'deck' container. i.e. a stack of cards. Currently no testing for multiple decks
+        -- in the same zone as this should never happen.
+        local deckContainer
+
         -- Next we override (replace the super class') getZoneType(), and return our zone type.
         function self.getZoneType()
             return CardDropZone.ZONE_TYPE
@@ -68,17 +72,36 @@ setmetatable(CardDropZone, TableUtils.merge(getmetatable(DropZone), {
             return validType
         end
 
+        -- Expose the deck container object in this drop zone.
+        function self.getDeckContainer()
+            return deckContainer
+        end
+
         local superSave = self.save
 
         ---@return CardDropZone_SavedState
         function self.save()
             return --[[---@type CardDropZone_SavedState]] TableUtils.merge(superSave(), {
                 validType = validType,
+                deckContainer = deckContainer
             })
         end
 
         -- All ge_tts DropZones have a filterObject() method. 
         local superFilterObject = self.filterObject
+        local buildCount = 0
+        EventManager.addHandler(
+            'onObjectEnterContainer',
+            ---@param container tts__Container
+            ---@param object tts__Object
+            function(container, object)
+                if Instance.getOneInstance(container).getZone() == self then
+                    if TableUtils.find(self.getObject().getObjects(), container) then
+                        deckContainer = container
+                    end
+                end
+            end
+        )
 
         --- Called when a player attempts to drop an object within this zone. The return value
         --- indicates whether the zone wishes to accept, reject or ignore the object being dropped.

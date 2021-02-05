@@ -5,6 +5,7 @@ local TableUtils = require('ge_tts.TableUtils')
 local ObjectUtils = require('ge_tts.ObjectUtils')
 local CardDropZone = require('polycolony.CardDropZone')
 local HandZone = require('ge_tts.HandZone')
+local Logger = require('ge_tts.Logger')
 
 -- Implemented custom classes for card spawning
 local CardInstance = require('polycolony.CardInstance')
@@ -29,28 +30,8 @@ local function onLoad(state)
     if isBlankSave then
         -- We have no save and we are loading for the first time.
 
-        local Cards = CardComponents(WorldLayout.SMALL)
-        -- local i = -1
-        -- for _,card in pairs(CardLibrary) do
-        --     i = i + 1
-
-        --     -- Just a test for loop to load one of each resource type. Just spawns some stuff
-        --     if card.type == CardType.RESOURCE then
-        --         --spawn the cards under the table, they will be dropped into their respective zones later
-        --         local cardState = CardUtils.cardState(card, {0, -10, 0})
-        --         local cardObject = ObjectUtils.safeSpawnObject(cardState)
-        --         local cardInstance = CardInstance(card, cardObject)
-
-        --         local cardDropZone = CardDropZone({-5 + (i * 3), 2, 0}, {0, 180, 0}, {2.5, 3, 1}, card.subtype)
-
-                
-
-        --         table.insert(cardInstances, cardInstance)
-        --         table.insert(cardDropZones, cardDropZone)
-
-        --         cardDropZone.drop(nil, cardInstance.getObject())
-        --     end
-        -- end
+        -- Build all the card related components including drop zones
+        CardComponents(WorldLayout.SMALL)
     else
         --We need to restore the save game.
         local savedState = JSON.decode(state)
