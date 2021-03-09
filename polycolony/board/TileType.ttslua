@@ -1,0 +1,9 @@
+local TileType = {}
+
+TileType.WHEAT = "wheat"
+TileType.BRICK = "brick"
+TileType.WOOD = "wood"
+TileType.ORE = "ore"
+TileType.SHEEP = "sheep"
+
+return TileType

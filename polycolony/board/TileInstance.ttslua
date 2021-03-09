@@ -1,0 +1,54 @@
+local Instance = require('ge_tts.Instance')
+local TableUtils = require('ge_tts.TableUtils')
+local Vector3 = require('ge_tts.Vector3')
+local TileUtils = require('polycolony.TableUtils')
+
+local TileInstance = {}
+
+TileInstance.INSTNANCE_TYPE = {}
+
+
+
+setmetatable(TileInstance, TableUtils.merge(getmetatable(Instance)), {
+    __call = function(_, tileOrSavedState, nilOrObjectOrGuid, nilOrContainer, edgeLength)
+
+        local isSavedState = TileInstance.isSavedState(tileOrSavedState)
+
+        local self = --[[---@type CardInstance]] (
+            isSavedState and Instance(--[[---@type CardInstance_SavedState]] tileOrSavedState)
+                or Instance(--[[---@not nil]] nilOrObjectOrGuid, nilOrContainer)
+        )
+
+        -- The actual TTS object associated with this instance
+        local tile
+
+        local edgeLength = edgeLength
+
+        -- The qubic coordinates of the associated object relative to the board origin
+        local positionCubic
+
+        function self.getTile()
+            return tile
+        end
+
+        function self.getPositionCubic()
+            return Vector3(positionCubic)
+        end
+
+        function self.moveTo(newPositionCubic)
+            positionCubic = newPositionCubic
+            local new = Vector3.TileUtils.qubicToWorld(newPositionCubic, edgeLength)
+            -- TODO moving
+        end
+
+        function self.getEdgeLength()
+            return edgeLength
+        end
+
+        function self.getType()
+            return TileInstance.INSTANCE_TYPE
+        end
+        return self
+    end,
+    __index = Instance,
+})

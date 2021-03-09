@@ -1,0 +1,33 @@
+AbstractAcceptor = {}
+
+setmetatable(AbstractAcceptor, {
+    __call = function()
+        self = {}
+
+        self.solution = {}
+
+        function self.setSolution()
+            self.solution = solution
+        end
+
+        function self.getSolution()
+            return self.solution
+        end
+
+        self.accept = function(assignment) return true end
+
+        function self.assignSolution(solutionNode, color, neighbors) end
+
+        function self.removeSolution(solutionNode, color, neighbors)
+            self.solution[solutionNode].assignment = -1
+            -- Will use this for replacing neighbors with constraints
+            -- for node in pairs(neighbors) do
+            --     self.solution[node].available[color] = color
+            -- end
+        end
+
+        return self
+    end
+})
+
+return AbstractAcceptor

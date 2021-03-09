@@ -1,0 +1,9 @@
+local AssetLibrary = require('polycolony.TileAssetLibrary')
+local Tiles = {}
+    Tiles.WHEAT = {
+        name = "wheat",
+        mesh = AssetLibrary.WHEAT.MESH,
+        diffuse = AssetLibrary.WHEAT.DIFFUSE,
+    }
+
+return Tiles

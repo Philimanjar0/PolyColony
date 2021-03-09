@@ -1,0 +1,36 @@
+local GraphUtils = {}
+
+-- Get the coordinates of hexagonal neighbor locations relative to the given node.
+function GraphUtils.getAllNeighbors(x, y)
+    return {
+        {x + 1, y + 0},
+        {x + 1, y + -1},
+        {x + 0, y + -1},
+        {x + -1, y + 0},
+        {x + -1, y + 1},
+        {x + 0, y + 1},
+    }
+end
+
+-- Turn a node (x, y) into a string in the form "x;y;" to be used as a table key value
+function GraphUtils.getKeyForNode(x, y)
+    local node = ""
+    for _,iKey in pairs({x,y}) do
+        node = node .. tostring(iKey) .. ";"
+    end
+    return node
+end
+
+-- Parse a key string from getKeyForNode() and convert into a list in integers.
+function GraphUtils.split (inputstr, sep)
+        if sep == nil then
+                sep = "%s"
+        end
+        local t={}
+        for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+                table.insert(t, str)
+        end
+        return t
+end
+
+return GraphUtils

@@ -1,0 +1,34 @@
+-- TODO upload assets to somewhere
+
+local TileAssetLibrary = {
+    BRICK = {
+        MESH = "E:/PolyColony/out/tiles/clay/clay.obj",
+        DIFFUSE = "E:/PolyColony/out/tiles/clay/clay.png",
+    },
+    WHEAT = {
+        MESH = "E:/PolyColony/out/tiles/wheat/wheat.obj",
+        DIFFUSE = "E:/PolyColony/out/tiles/wheat/wheat.png",
+    },
+    ORE = {
+        MESH = "E:/PolyColony/out/tiles/ore/ore.obj",
+        DIFFUSE = "E:/PolyColony/out/tiles/ore/ore.png",
+    },
+    SHEEP = {
+        MESH = "E:/PolyColony/out/tiles/sheep/sheep.obj",
+        DIFFUSE = "E:/PolyColony/out/tiles/sheep/sheep.png",
+    },
+    WOOD = {
+        MESH = "E:/PolyColony/out/tiles/wood/wood.obj",
+        DIFFUSE = "E:/PolyColony/out/tiles/wood/wood.png",
+    },
+    DESERT = {
+        MESH = "E:/PolyColony/out/tiles/desert/desert.obj",
+        DIFFUSE = "E:/PolyColony/out/tiles/desert/desert.png",
+    },
+    OCEAN = {
+        MESH = "E:/PolyColony/out/tiles/ocean/ocean.obj",
+        DIFFUSE = "E:/PolyColony/out/tiles/ocean.png",
+    }
+}
+
+return TileAssetLibrary

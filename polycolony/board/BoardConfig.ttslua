@@ -1,0 +1,19 @@
+local TableUtils = require('ge_tts.TableUtils')
+
+local BoardConfig = {}
+
+BoardConfig.SMALL = {
+    SIZE = {
+        Q = {-2, 2},
+        R = {-2, 2}
+    },
+    RESOURCES = {
+        SHEEP = 2,
+        ORE = 2,
+        BRICK = 2,
+        WHEAT = 2,
+        WOOD = 2
+    }
+}
+--TODO add medium and large quantities
+--TODO add probability quantities

@@ -1,0 +1,39 @@
+-- Coordinate system conventions from https://www.redblobgames.com/grids/hexagons/
+
+local Vector3 = require('ge_tts.Vector3')
+local HexGraph = require('board.generator.HexGraph')
+
+local BoardGenerator = {}
+
+setmetatable(BoardGenerator, {
+    __call = function(worldLayout, edgeLength)
+        self = {}
+
+        -- Hex coordinates for the desert to remove that node from the graph. It should not get colored so it should not be in the domain.
+        local desertCoords = {
+            x = math.random(worldLayout.SIZE.MIN.x, worldLayout.SIZE.MAX.x),
+            y = math.random(worldLayout.SIZE.MIN.y, worldLayout.SIZE.MAX.y),
+            z = math.random(worldLayout.SIZE.MIN.z, worldLayout.SIZE.MAX.z)
+        }
+
+        -- Create and populate the HexGraph
+        self.hexGraph = HexGraph()
+
+        
+        return self
+    end,
+})
+
+--[[
+X = {-1,1}
+Y = {-1,1}
+Z = {-1,1}
+local i = 0
+for z=-3,3 do
+    for y=math.max(-2,-1 * z - 2),math.min(3, -1*z+3) do
+        local x = -1*z - y
+        print(i..": x="..x.." y="..y.." z="..z)
+        i = i+1
+    end
+end
+]]

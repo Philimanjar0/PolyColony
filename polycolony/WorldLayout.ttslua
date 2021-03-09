@@ -8,8 +8,8 @@ local Vector2 = require('ge_tts.Vector2')
 local Vector3 = require('ge_tts.Vector3')
 
 ---@type WorldLayout[]
-local GameSizeOrigins = {}
-GameSizeOrigins.SMALL = {
+local WorldLayout = {}
+WorldLayout.SMALL = {
     RESOURCE_CARDS = {
         POSITION = {
             x = -5,
@@ -33,11 +33,30 @@ GameSizeOrigins.SMALL = {
             y = 90,
             z = 0,
         }
+    },
+    BOARD = {
+        SIZE = {
+            MIN = {
+                x = -2,
+                y = -2,
+                z = -2
+            },
+            MAX = {
+                x = 2,
+                y = 2,
+                z = 2,
+            },
+        },
+        POSITION = {
+            x = 0,
+            y = 0,
+            z = 0
+        }
     }
 }
 
 
-GameSizeOrigins.MEDIUM = {}
-GameSizeOrigins.LARGE = {}
+WorldLayout.MEDIUM = {}
+WorldLayout.LARGE = {}
 
-return GameSizeOrigins
+return WorldLayout

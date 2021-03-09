@@ -1,0 +1,79 @@
+local AbstractAcceptor = require('board.generator.acceptors.AbstractAcceptor')
+local RandomAcceptor = require('board.generator.acceptors.RandomAcceptor')
+local TableUtils = require('ge_tts.TableUtils')
+
+CspSolver = {}
+
+local function getNext(partialSolution)
+    for node,table in pairs(partialSolution) do
+        if table.assignment == -1 then
+            return node
+        end
+    end
+    return nil
+end
+
+setmetatable(CspSolver, {
+    __call = function(underLyingGraph, availableColors, uniqueListOfColors)
+        self = {}
+
+        self.underlyingGraph = underLyingGraph
+
+        self.availableColors = availableColors
+
+        self.acceptor = AbstractAcceptor()
+
+        -- Table relating node tuples to a list of colors
+        self.solution = {}
+
+        -- Build the domain of the problem. i,e, available colors
+        for node in pairs(self.underlyingGraph.getNodeTuples()) do
+            self.solution[node] = {}
+            self.solution[node].available = TableUtils.copy(uniqueListOfColors)
+            self.solution[node].assignment = -1
+        end
+
+        function self.setAcceptor(newAcceptor)
+            self.acceptor = newAcceptor
+        end
+
+        function self.resetFilledBoard()
+            self.solution = {}
+        end
+
+        function self.getSolution()
+            return self.solution
+        end
+
+        function self.solveCsp()
+            if #self.solution == #self.underLyingGraph.getNodes() then
+                return self.solution
+            end
+            local nextToAssign = getNext(self.solution)
+            local nextNeighbors = self.underLyingGraph.getNeighbors(nextToAssign)
+            for color, quant in pairs(self.availableColors) do
+                if self.acceptor.accept() then
+                    self.acceptor.assignSolution(self.solution[nextToAssign], color, self.underLyingGraph.getNeighbors(nextToAssign))
+                    local nextResult = self.solveCsp()
+                    if nextResult then
+                        return nextResult
+                    else
+                        self.acceptor.removeSolution(nextToAssign, color, nextNeighbors)
+                    end
+                end
+            end
+            return false
+        end
+        return self
+
+        function self.getSolvedBoard()
+            local solvedBoard = {}
+            for node, table in pairs(self.solution) do
+                solvedBoard[node] = table.assignment
+            end
+            return solvedBoard
+        end
+    end
+})
+
+return CspSolver

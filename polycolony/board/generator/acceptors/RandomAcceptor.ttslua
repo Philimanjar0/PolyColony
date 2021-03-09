@@ -1,0 +1,19 @@
+local AbstractAcceptor = require('AbstractAcceptor')
+local TableUtils = require('ge_tts.TableUtils')
+
+RandomAcceptor = {}
+
+setmetatable(RandomAcceptor, TableUtils.merge(getmetatable(AbstractAcceptor), {
+    __call = function()
+
+        self = AbstractAcceptor()
+
+        -- We do not remove the color from the solution node's neighbors' list of possible colorings because we have no constraints.
+        function self.assignSolution(solutionNode, color)
+            self.getSolution()[solutionNode].assignment = color
+        end
+
+        return self
+    end,
+    __index = AbstractAcceptor
+}))
