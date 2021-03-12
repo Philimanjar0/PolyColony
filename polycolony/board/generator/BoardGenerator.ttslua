@@ -1,39 +1,51 @@
 -- Coordinate system conventions from https://www.redblobgames.com/grids/hexagons/
 
+-- q = x and r = z
+
 local Vector3 = require('ge_tts.Vector3')
 local HexGraph = require('board.generator.HexGraph')
+local CspSolver = require('board.generator.CspSolver')
+local AbstractAcceptor = require('board.generator.acceptors.AbstractAcceptor')
+local RandomAcceptor = require('board.generator.acceptors.RandomAcceptor')
 
 local BoardGenerator = {}
 
 setmetatable(BoardGenerator, {
-    __call = function(worldLayout, edgeLength)
+    __call = function(boardConfig, edgeLength)
         self = {}
-
-        -- Hex coordinates for the desert to remove that node from the graph. It should not get colored so it should not be in the domain.
-        local desertCoords = {
-            x = math.random(worldLayout.SIZE.MIN.x, worldLayout.SIZE.MAX.x),
-            y = math.random(worldLayout.SIZE.MIN.y, worldLayout.SIZE.MAX.y),
-            z = math.random(worldLayout.SIZE.MIN.z, worldLayout.SIZE.MAX.z)
-        }
 
         -- Create and populate the HexGraph
         self.hexGraph = HexGraph()
 
+
+        -- Hex coordinates for the desert to remove that node from the graph. It should not get colored so it should not be in the domain.
+        local desertCoords = {
+            x = math.random(boardConfig.SIZE.X[1], boardConfig.SIZE.X[2]),
+            y = math.random(boardConfig.SIZE.X[1], boardConfig.SIZE.Y[2]),
+            z = math.random(boardConfig.SIZE.Z[1], boardConfig.SIZE.Z[2])
+        }
+
+        -- We do waste a bit of looping to get all the tiles because for each z loop, only one value satisfies the x+y+z=0 constraint.
+        -- Not sure how else to do non-symmetric boards right now, who cares though it runs once.
+        --TODO make this loop more efficient. calculate one of the values from the other 3
+        for x = boardConfig.SIZE.X[1], boardConfig.SIZE.X[2] do
+            for y = boardConfig.SIZE.X[1], boardConfig.SIZE.Y[2] do
+                for z = boardConfig.SIZE.Z[1], boardConfig.SIZE.Z[2] do
+                    if x + y + z == 0 then
+                        -- add all the nodes to the underlying graph that fit the layout defined in BoardConfig
+                        self.hexGraph.addNode(x, z)
+                    end
+                end
+            end
+        end
+
+        -- Remove the desert node from the graph to speed up generation.
+        self.hexGraph.removeNode(desertCoords.x, desertCoords.z)
+
+        -- Build the CSP solver for resources
+        self.cspSolver = CspSolver(self.hexGraph, boardConfig.RESOURCES)
+        self.cspSolver.setAcceptor(RandomAcceptor)
         
         return self
     end,
 })
-
---[[
-X = {-1,1}
-Y = {-1,1}
-Z = {-1,1}
-local i = 0
-for z=-3,3 do
-    for y=math.max(-2,-1 * z - 2),math.min(3, -1*z+3) do
-        local x = -1*z - y
-        print(i..": x="..x.." y="..y.." z="..z)
-        i = i+1
-    end
-end
-]]

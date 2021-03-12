@@ -2,7 +2,7 @@
 local DropZone = require('ge_tts.DropZone')
 local Instance = require('ge_tts.Instance')
 local TableUtils = require('ge_tts.TableUtils')
-local CardInstance = require('polycolony.CardInstance')
+local CardInstance = require('polycolony.cards.CardInstance')
 local EventManager = require('ge_tts.EventManager')
 
 -- CardDropZone is a subclass of DropZone. We have a large number of cards, but they are all similar enough

@@ -14,7 +14,7 @@ local function getNext(partialSolution)
 end
 
 setmetatable(CspSolver, {
-    __call = function(underLyingGraph, availableColors, uniqueListOfColors)
+    __call = function(underLyingGraph, availableColors)
         self = {}
 
         self.underlyingGraph = underLyingGraph
@@ -23,13 +23,22 @@ setmetatable(CspSolver, {
 
         self.acceptor = AbstractAcceptor()
 
+        -- This is just a raw list of colors to use as a domain. Each vertex will have this list as colors 
+        -- that can be assigned without violating the constraints.
+
+        self.uniqueListOfColors = {}
+        
+        for color, quant in availableColors do
+            self.uniqueListOfColors[color] = color
+        end
+
         -- Table relating node tuples to a list of colors
         self.solution = {}
 
         -- Build the domain of the problem. i,e, available colors
         for node in pairs(self.underlyingGraph.getNodeTuples()) do
             self.solution[node] = {}
-            self.solution[node].available = TableUtils.copy(uniqueListOfColors)
+            self.solution[node].available = TableUtils.copy(self.uniqueListOfColors)
             self.solution[node].assignment = -1
         end
 
@@ -51,14 +60,18 @@ setmetatable(CspSolver, {
             end
             local nextToAssign = getNext(self.solution)
             local nextNeighbors = self.underLyingGraph.getNeighbors(nextToAssign)
+            --TODO if performance is bad, do better ordering than just the default.
             for color, quant in pairs(self.availableColors) do
-                if self.acceptor.accept() then
-                    self.acceptor.assignSolution(self.solution[nextToAssign], color, self.underLyingGraph.getNeighbors(nextToAssign))
-                    local nextResult = self.solveCsp()
-                    if nextResult then
-                        return nextResult
-                    else
-                        self.acceptor.removeSolution(nextToAssign, color, nextNeighbors)
+                if quant > 0 then
+                    -- Dont check colors that are not available anymore.
+                    if self.acceptor.accept() then
+                        self.acceptor.assignSolution(self.solution[nextToAssign], color, self.underLyingGraph.getNeighbors(nextToAssign))
+                        local nextResult = self.solveCsp()
+                        if nextResult then
+                            return nextResult
+                        else
+                            self.acceptor.removeSolution(nextToAssign, color, nextNeighbors)
+                        end
                     end
                 end
             end

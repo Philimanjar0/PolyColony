@@ -16,9 +16,11 @@ setmetatable(AbstractAcceptor, {
 
         self.accept = function(assignment) return true end
 
-        function self.assignSolution(solutionNode, color, neighbors) end
+        function self.assignSolution(solutionNode, color, neighbors, availableColors) 
+            self.solution[solutionNode].assignment = color
+        end
 
-        function self.removeSolution(solutionNode, color, neighbors)
+        function self.removeSolution(solutionNode, color, neighbors, availableColors)
             self.solution[solutionNode].assignment = -1
             -- Will use this for replacing neighbors with constraints
             -- for node in pairs(neighbors) do

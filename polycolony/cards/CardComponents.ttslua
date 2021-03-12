@@ -1,11 +1,11 @@
 local WorldLayout = require('polycolony.WorldLayout')
-local CardInstance = require('polycolony.CardInstance')
-local CardLibrary = require('polycolony.CardLibrary')
-local CardType = require('polycolony.CardType')
-local CardUtils = require('polycolony.CardUtils')
+local CardInstance = require('polycolony.cards.CardInstance')
+local CardLibrary = require('polycolony.cards.CardLibrary')
+local CardType = require('polycolony.cards.CardType')
+local CardUtils = require('polycolony.cards.CardUtils')
 local TableUtils = require('ge_tts.TableUtils')
 local ObjectUtils = require('ge_tts.ObjectUtils')
-local CardDropZone = require('polycolony.CardDropZone')
+local CardDropZone = require('polycolony.cards.CardDropZone')
 local DropZone = require('ge_tts.DropZone')
 
 

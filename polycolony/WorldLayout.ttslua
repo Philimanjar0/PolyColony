@@ -35,23 +35,11 @@ WorldLayout.SMALL = {
         }
     },
     BOARD = {
-        SIZE = {
-            MIN = {
-                x = -2,
-                y = -2,
-                z = -2
-            },
-            MAX = {
-                x = 2,
-                y = 2,
-                z = 2,
-            },
-        },
         POSITION = {
             x = 0,
             y = 0,
-            z = 0
-        }
+            z = 0,
+        },
     }
 }
 

@@ -11,41 +11,41 @@ setmetatable(HexGraph, {
         self.nodes = {}
 
         -- Add a node to the graph. Will automatically connect to adjacent nodes that are also in the graph.
-        -- @param x The x value of the node to add in axial hex coordinates.
-        -- @param y The y value of the node ot add in axial hex coordinates.
-        function self.addNode(x, y)
-            node = GraphUtils.getKeyForNode(x, y)
+        -- @param q The q value of the node to add in axial hex coordinates.
+        -- @param r The r value of the node ot add in axial hex coordinates.
+        function self.addNode(q, r)
+            node = GraphUtils.getKeyForNode(q, r)
             --print(node)
             self.nodes[node] = {}
-            for _,neighbor in pairs(GraphUtils.getAllNeighbors(x, y)) do
+            for _,neighbor in pairs(GraphUtils.getAllNeighbors(q, r)) do
                 neighborKey = GraphUtils.getKeyForNode(neighbor[1], neighbor[2])
                 if self.nodes[neighborKey] then
                     table.insert(self.nodes[node], neighbor)
-                    table.insert(self.nodes[neighborKey], {x, y})
+                    table.insert(self.nodes[neighborKey], {q, r})
                 end
             end
         end
 
         -- Remove a node from the graph. Will automatically remove all edges.
-        -- @param x The x value of the node to remove in axial hex coordinates.
-        -- @param y The y value of the node ot remove in axial hex coordinates.
-        function self.removeNode(x, y)
-            for _,neighbor in pairs(GraphUtils.getAllNeighbors(x, y)) do
+        -- @param q The r value of the node to remove in axial hex coordinates.
+        -- @param r The r value of the node ot remove in axial hex coordinates.
+        function self.removeNode(q, r)
+            for _,neighbor in pairs(GraphUtils.getAllNeighbors(q, r)) do
                 nKey = GraphUtils.getKeyForNode(neighbor[1], neighbor[2])
                 if self.nodes[nKey] then
                     for i,node in pairs(self.nodes[nKey]) do
-                        if node[1] == x and node[2] == y then
+                        if node[1] == q and node[2] == r then
                             table.remove(self.nodes[nKey], i)
                         end
                     end
                 end
             end
-            self.nodes[{x,y}] = nil
+            self.nodes[{q,r}] = nil
         end
 
         -- Get actual neighbors of given node.
-        -- @param x The x value of given node in axial hex coordinates.
-        -- @param y The y value of the given node in axial hex coordinates.
+        -- @param q The q value of given node in axial hex coordinates.
+        -- @param r The r value of the given node in axial hex coordinates.
         -- @return list of neighbors. Returns as a list of a list of keys in the form of strings returned by GraphUtils.getKeyForNode.
         function self.getNeighbors(node)
             return self.nodes[node]

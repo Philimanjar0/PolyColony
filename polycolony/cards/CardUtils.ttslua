@@ -1,6 +1,6 @@
 local Object = require('ge_tts.Object')
 local ObjectUtils = require('ge_tts.ObjectUtils')
-local AssetLibrary = require('polycolony.CardAssetLibrary')
+local AssetLibrary = require('polycolony.cards.CardAssetLibrary')
 
 -- We're going to be creating TTS (custom) card objects at runtime for each card in our card library.
 -- To do this we need to create a special representation of TTS card object that TTS knows how to

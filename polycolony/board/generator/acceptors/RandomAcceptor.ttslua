@@ -6,13 +6,19 @@ RandomAcceptor = {}
 setmetatable(RandomAcceptor, TableUtils.merge(getmetatable(AbstractAcceptor), {
     __call = function()
 
+        --TODO probably have to do some table merge stuff that we see in ge_tts?
         self = AbstractAcceptor()
 
         -- We do not remove the color from the solution node's neighbors' list of possible colorings because we have no constraints.
-        function self.assignSolution(solutionNode, color)
+        function self.assignSolution(solutionNode, color, neighbors, availableColors)
             self.getSolution()[solutionNode].assignment = color
+            availableColors[color] = availableColors[color] - 1
         end
 
+        function self.removeSolution(solutionNode, color, neighbors, availableColors)
+            self.getSolution()[solutionNode].assignment = -1
+            availableColors[color] = availableColors[color] + 1
+        end
         return self
     end,
     __index = AbstractAcceptor

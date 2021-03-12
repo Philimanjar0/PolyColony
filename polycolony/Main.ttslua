@@ -1,19 +1,20 @@
 -- ge_tts objects to be used for saving, loading, and generally setting up.
+
 local SaveManager = require('ge_tts.SaveManager')
 local JSON = require('ge_tts.json')
 local TableUtils = require('ge_tts.TableUtils')
 local ObjectUtils = require('ge_tts.ObjectUtils')
-local CardDropZone = require('polycolony.CardDropZone')
 local HandZone = require('ge_tts.HandZone')
 local Logger = require('ge_tts.Logger')
 
 -- Implemented custom classes for card spawning
-local CardInstance = require('polycolony.CardInstance')
-local CardLibrary = require('polycolony.CardLibrary')
-local CardType = require('polycolony.CardType')
-local CardUtils = require('polycolony.CardUtils')
-local CardComponents = require('polycolony.CardComponents')
+local CardInstance = require('polycolony.cards.CardInstance')
+local CardLibrary = require('polycolony.cards.CardLibrary')
+local CardType = require('polycolony.cards.CardType')
+local CardUtils = require('polycolony.cards.CardUtils')
+local CardComponents = require('polycolony.cards.CardComponents')
 local WorldLayout = require('polycolony.WorldLayout')
+local CardDropZone = require('polycolony.cards.CardDropZone')
 
 
 
@@ -31,7 +32,7 @@ local function onLoad(state)
         -- We have no save and we are loading for the first time.
 
         -- Build all the card related components including drop zones
-        CardComponents(WorldLayout.SMALL)
+        --CardComponents(WorldLayout.SMALL)
     else
         --We need to restore the save game.
         local savedState = JSON.decode(state)

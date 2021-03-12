@@ -1,5 +1,5 @@
-local CardType = require('polycolony.CardType')
-local AssetLibrary = require('polycolony.CardAssetLibrary')
+local CardType = require('polycolony.cards.CardType')
+local AssetLibrary = require('polycolony.cards.CardAssetLibrary')
 
 ---@shape Card
 ---@field name string | CardSubType nickname that appears in the tool tip in game.
