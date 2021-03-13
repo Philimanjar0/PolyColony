@@ -38,8 +38,7 @@ local function onLoad(state)
             -- Build all the card related components including drop zones
             --CardComponents(WorldLayout.SMALL)
             local boardGenerator = BoardGenerator(BoardConfig.SMALL, 2)
-    
-            --print(BoardConfig.SMALL.SIZE.X[1])
+
         else
             --We need to restore the save game.
             local savedState = JSON.decode(state)

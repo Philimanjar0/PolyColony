@@ -9,12 +9,6 @@ setmetatable(CspSolver, {
         
         local self = {}
 
-        print("inside")
-        print(underlyingGraph)
-        print(underlyingGraph.getNodes())
-
-        
-
         self.underlyingGraph = underlyingGraph
         
         self.availableColors = availableColors
@@ -32,13 +26,14 @@ setmetatable(CspSolver, {
         self.solution = {}
 
         -- Build the domain of the problem. i,e, available colors
-        for node in pairs(self.underlyingGraph.getNodeTuples()) do
+        for node in pairs(self.underlyingGraph.getNodes()) do
+            -- print(node)
             self.solution[node] = {}
             self.solution[node].available = TableUtils.copy(self.uniqueListOfColors)
             self.solution[node].assignment = -1
         end
 
-        self.acceptor = AbstractAcceptor(self.solution)
+        self.acceptor = AbstractAcceptor(self.solution, 18)
 
         function self.setAcceptor(newAcceptor)
             self.acceptor = newAcceptor
@@ -52,8 +47,8 @@ setmetatable(CspSolver, {
             return self.solution
         end
 
-        local function getNext(partialSolution)
-            for node,table in pairs(partialSolution) do
+        local function getNext()
+            for node,table in pairs(self.solution) do
                 if table.assignment == -1 then
                     return node
                 end
@@ -62,17 +57,17 @@ setmetatable(CspSolver, {
         end
 
         function self.solveCsp()
-            if #self.solution == #self.underLyingGraph.getNodes() then
+            if self.acceptor.areAllSolved() then
                 return self.solution
             end
-            local nextToAssign = getNext(self.solution)
-            local nextNeighbors = self.underLyingGraph.getNeighbors(nextToAssign)
+            local nextToAssign = getNext()
+            local nextNeighbors = self.underlyingGraph.getNeighbors(nextToAssign)
             --TODO if performance is bad, do better ordering than just the default.
             for color, quant in pairs(self.availableColors) do
                 if quant > 0 then
                     -- Dont check colors that are not available anymore.
                     if self.acceptor.accept() then
-                        self.acceptor.assignSolution(self.solution[nextToAssign], color, self.underLyingGraph.getNeighbors(nextToAssign))
+                        self.acceptor.assignSolution(nextToAssign, color, self.underlyingGraph.getNeighbors(nextToAssign))
                         local nextResult = self.solveCsp()
                         if nextResult then
                             return nextResult

@@ -40,14 +40,15 @@ setmetatable(BoardGenerator, {
 
         -- Remove the desert node from the graph to speed up generation.
         self.hexGraph.removeNode(desertCoords.x, desertCoords.z)
-        print("outside function")
-        print(self.hexGraph)
-
-        print(self.hexGraph.getNodes())
         
         -- Build the CSP solver for resources
         self.cspSolver = CspSolver(self.hexGraph, boardConfig.RESOURCES)
-        --self.cspSolver.setAcceptor(AbstractAcceptor())
+        self.cspSolver.solveCsp()
+
+        for node, nodeTable in pairs(self.cspSolver.getSolution()) do
+            print(nodeTable.assignment)
+        end
+        
         
         return self
     end,

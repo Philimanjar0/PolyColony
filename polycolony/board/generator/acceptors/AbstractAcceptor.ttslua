@@ -1,13 +1,18 @@
 local AbstractAcceptor = {}
 
 setmetatable(AbstractAcceptor, {
-    __call = function(solution)
+    __call = function(_,solution, numberOfNodes)
         local self = {}
 
-        self.solution = {}
+        self.solution = solution
 
-        function self.setSolution()
-            self.solution = solution
+        self.numberOfNodes = numberOfNodes
+
+        self.solvedVertices = 0
+
+        function self.setSolution(newSolution, solvedVertices)
+            self.solution = newSolution
+            self.solvedVertices = solvedVertices
         end
 
         function self.getSolution()
@@ -16,8 +21,9 @@ setmetatable(AbstractAcceptor, {
 
         self.accept = function(assignment) return true end
 
-        function self.assignSolution(solutionNode, color, neighbors, availableColors) 
+        function self.assignSolution(solutionNode, color, neighbors, availableColors)
             self.solution[solutionNode].assignment = color
+            self.solvedVertices = self.solvedVertices + 1
         end
 
         function self.removeSolution(solutionNode, color, neighbors, availableColors)
@@ -26,6 +32,10 @@ setmetatable(AbstractAcceptor, {
             -- for node in pairs(neighbors) do
             --     self.solution[node].available[color] = color
             -- end
+        end
+
+        function self.areAllSolved()
+            return self.solvedVertices == self.numberOfNodes
         end
 
         return self

@@ -61,7 +61,6 @@ setmetatable(HexGraph, {
         end
 
         function self.getNodes()
-            print(self.nodes)
             return self.nodes
         end
         
