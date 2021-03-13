@@ -1,5 +1,3 @@
-local TableUtils = require('ge_tts.TableUtils')
-
 local BoardConfig = {}
 
 BoardConfig.SMALL = {
@@ -16,5 +14,7 @@ BoardConfig.SMALL = {
         WOOD = 4
     }
 }
+
+return BoardConfig
 --TODO add medium and large quantities
 --TODO add probability quantities

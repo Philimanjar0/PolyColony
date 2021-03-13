@@ -1,34 +1,30 @@
-local AbstractAcceptor = require('board.generator.acceptors.AbstractAcceptor')
-local RandomAcceptor = require('board.generator.acceptors.RandomAcceptor')
+local AbstractAcceptor = require('polycolony.board.generator.acceptors.AbstractAcceptor')
+local RandomAcceptor = require('polycolony.board.generator.acceptors.RandomAcceptor')
 local TableUtils = require('ge_tts.TableUtils')
 
-CspSolver = {}
-
-local function getNext(partialSolution)
-    for node,table in pairs(partialSolution) do
-        if table.assignment == -1 then
-            return node
-        end
-    end
-    return nil
-end
+local CspSolver = {}
 
 setmetatable(CspSolver, {
-    __call = function(underLyingGraph, availableColors)
-        self = {}
+    __call = function(_, underlyingGraph, availableColors)
+        
+        local self = {}
 
-        self.underlyingGraph = underLyingGraph
+        print("inside")
+        print(underlyingGraph)
+        print(underlyingGraph.getNodes())
 
+        
+
+        self.underlyingGraph = underlyingGraph
+        
         self.availableColors = availableColors
-
-        self.acceptor = AbstractAcceptor()
 
         -- This is just a raw list of colors to use as a domain. Each vertex will have this list as colors 
         -- that can be assigned without violating the constraints.
 
         self.uniqueListOfColors = {}
         
-        for color, quant in availableColors do
+        for color, quant in pairs(availableColors) do
             self.uniqueListOfColors[color] = color
         end
 
@@ -42,6 +38,8 @@ setmetatable(CspSolver, {
             self.solution[node].assignment = -1
         end
 
+        self.acceptor = AbstractAcceptor(self.solution)
+
         function self.setAcceptor(newAcceptor)
             self.acceptor = newAcceptor
         end
@@ -52,6 +50,15 @@ setmetatable(CspSolver, {
 
         function self.getSolution()
             return self.solution
+        end
+
+        local function getNext(partialSolution)
+            for node,table in pairs(partialSolution) do
+                if table.assignment == -1 then
+                    return node
+                end
+            end
+            return nil
         end
 
         function self.solveCsp()
@@ -78,14 +85,6 @@ setmetatable(CspSolver, {
             return false
         end
         return self
-
-        function self.getSolvedBoard()
-            local solvedBoard = {}
-            for node, table in pairs(self.solution) do
-                solvedBoard[node] = table.assignment
-            end
-            return solvedBoard
-        end
     end
 })
 

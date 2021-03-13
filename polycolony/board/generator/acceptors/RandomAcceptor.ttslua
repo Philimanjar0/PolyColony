@@ -1,13 +1,13 @@
-local AbstractAcceptor = require('AbstractAcceptor')
+local AbstractAcceptor = require('polycolony.board.generator.acceptors.AbstractAcceptor')
 local TableUtils = require('ge_tts.TableUtils')
 
-RandomAcceptor = {}
+local RandomAcceptor = {}
 
 setmetatable(RandomAcceptor, TableUtils.merge(getmetatable(AbstractAcceptor), {
-    __call = function()
+    __call = function(_)
 
-        --TODO probably have to do some table merge stuff that we see in ge_tts?
-        self = AbstractAcceptor()
+        --TODO probably have to do some table merge stuff that we see in ge_tts? For saved states
+        local self = AbstractAcceptor()
 
         -- We do not remove the color from the solution node's neighbors' list of possible colorings because we have no constraints.
         function self.assignSolution(solutionNode, color, neighbors, availableColors)
@@ -23,3 +23,5 @@ setmetatable(RandomAcceptor, TableUtils.merge(getmetatable(AbstractAcceptor), {
     end,
     __index = AbstractAcceptor
 }))
+
+return RandomAcceptor

@@ -11,12 +11,11 @@ local RandomAcceptor = require('board.generator.acceptors.RandomAcceptor')
 local BoardGenerator = {}
 
 setmetatable(BoardGenerator, {
-    __call = function(boardConfig, edgeLength)
-        self = {}
+    __call = function(_, boardConfig, edgeLength)
+        local self = {}
 
         -- Create and populate the HexGraph
         self.hexGraph = HexGraph()
-
 
         -- Hex coordinates for the desert to remove that node from the graph. It should not get colored so it should not be in the domain.
         local desertCoords = {
@@ -41,11 +40,17 @@ setmetatable(BoardGenerator, {
 
         -- Remove the desert node from the graph to speed up generation.
         self.hexGraph.removeNode(desertCoords.x, desertCoords.z)
+        print("outside function")
+        print(self.hexGraph)
 
+        print(self.hexGraph.getNodes())
+        
         -- Build the CSP solver for resources
         self.cspSolver = CspSolver(self.hexGraph, boardConfig.RESOURCES)
-        self.cspSolver.setAcceptor(RandomAcceptor)
+        --self.cspSolver.setAcceptor(AbstractAcceptor())
         
         return self
     end,
 })
+
+return BoardGenerator

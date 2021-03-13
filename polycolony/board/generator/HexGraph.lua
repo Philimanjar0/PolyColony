@@ -1,10 +1,10 @@
 local GraphUtils = require('board.generator.GraphUtils')
 
-HexGraph = {}
+local HexGraph = {}
 
 setmetatable(HexGraph, {
     __call = function()
-        self = {}
+        local self = {}
 
         -- The collection of nodes in the graph.
         -- Maps a node to its neighbors.
@@ -14,11 +14,10 @@ setmetatable(HexGraph, {
         -- @param q The q value of the node to add in axial hex coordinates.
         -- @param r The r value of the node ot add in axial hex coordinates.
         function self.addNode(q, r)
-            node = GraphUtils.getKeyForNode(q, r)
-            --print(node)
+            local node = GraphUtils.getKeyForNode(q, r)
             self.nodes[node] = {}
             for _,neighbor in pairs(GraphUtils.getAllNeighbors(q, r)) do
-                neighborKey = GraphUtils.getKeyForNode(neighbor[1], neighbor[2])
+                local neighborKey = GraphUtils.getKeyForNode(neighbor[1], neighbor[2])
                 if self.nodes[neighborKey] then
                     table.insert(self.nodes[node], neighbor)
                     table.insert(self.nodes[neighborKey], {q, r})
@@ -62,6 +61,7 @@ setmetatable(HexGraph, {
         end
 
         function self.getNodes()
+            print(self.nodes)
             return self.nodes
         end
         

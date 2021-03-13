@@ -1,5 +1,4 @@
 -- ge_tts objects to be used for saving, loading, and generally setting up.
-
 local SaveManager = require('ge_tts.SaveManager')
 local JSON = require('ge_tts.json')
 local TableUtils = require('ge_tts.TableUtils')
@@ -16,6 +15,9 @@ local CardComponents = require('polycolony.cards.CardComponents')
 local WorldLayout = require('polycolony.WorldLayout')
 local CardDropZone = require('polycolony.cards.CardDropZone')
 
+-- Board Stuff
+local BoardGenerator = require('polycolony.board.generator.BoardGenerator')
+local BoardConfig = require('polycolony.board.BoardConfig')
 
 
 -- Table to keep track of instances and zones
@@ -26,24 +28,33 @@ local cardInstances = {}
 local cardDropZones = {}
 
 local function onLoad(state)
-    local isBlankSave = state == ''
+    -- Using a wait here to allow the debugger to catch any breaks
+    Wait.time(function()
+        local isBlankSave = state == ''
 
-    if isBlankSave then
-        -- We have no save and we are loading for the first time.
-
-        -- Build all the card related components including drop zones
-        --CardComponents(WorldLayout.SMALL)
-    else
-        --We need to restore the save game.
-        local savedState = JSON.decode(state)
-
-        for _, cardSavedState in ipairs(savedState.cardInstances) do
-            local instance = CardInstance(cardSavedState)
-            -- Keep track of the instance we just created
-            table.insert(cardInstances, instance)
+        if isBlankSave then
+            -- We have no save and we are loading for the first time.
+    
+            -- Build all the card related components including drop zones
+            --CardComponents(WorldLayout.SMALL)
+            local boardGenerator = BoardGenerator(BoardConfig.SMALL, 2)
+    
+            --print(BoardConfig.SMALL.SIZE.X[1])
+        else
+            --We need to restore the save game.
+            local savedState = JSON.decode(state)
+    
+            for _, cardSavedState in ipairs(savedState.cardInstances) do
+                local instance = CardInstance(cardSavedState)
+                -- Keep track of the instance we just created
+                table.insert(cardInstances, instance)
+            end
         end
-    end
+    end,
+    1)
 end
+
+
 
 local function onSave()
     local savedState = {

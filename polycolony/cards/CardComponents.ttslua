@@ -49,7 +49,7 @@ setmetatable(CardComponents, {
     ---@param worldLayout nil | GameSizeOrigin
     __call = function(_,worldLayout)
 
-        self = {}
+        local self = {}
         
         -- Table to keep track of instances and zones
         ---@type CardInstance[]
