@@ -1,3 +1,4 @@
+local Console = require("Console/console++")
 -- ge_tts objects to be used for saving, loading, and generally setting up.
 local SaveManager = require('ge_tts.SaveManager')
 local JSON = require('ge_tts.json')
@@ -50,7 +51,7 @@ local function onLoad(state)
             end
         end
     end,
-    1)
+    0)
 end
 
 

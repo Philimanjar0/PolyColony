@@ -4,21 +4,24 @@ local TableUtils = require('ge_tts.TableUtils')
 local RandomAcceptor = {}
 
 setmetatable(RandomAcceptor, TableUtils.merge(getmetatable(AbstractAcceptor), {
-    __call = function(_)
+    __call = function(_,solution, numberOfNodes)
 
         --TODO probably have to do some table merge stuff that we see in ge_tts? For saved states
-        local self = AbstractAcceptor()
+        local self = AbstractAcceptor(solution, numberOfNodes)
 
         -- We do not remove the color from the solution node's neighbors' list of possible colorings because we have no constraints.
-        function self.assignSolution(solutionNode, color, neighbors, availableColors)
-            self.getSolution()[solutionNode].assignment = color
-            availableColors[color] = availableColors[color] - 1
+        function self.assignSolution(solutionNode, color, neighbors)
+            self.solution[solutionNode].assignment = color
+            self.solution[solutionNode].available[color] = nil
+            self.solvedVertices = self.solvedVertices + 1
         end
 
-        function self.removeSolution(solutionNode, color, neighbors, availableColors)
-            self.getSolution()[solutionNode].assignment = -1
-            availableColors[color] = availableColors[color] + 1
+        function self.removeSolution(solutionNode, color, neighbors)
+            self.solution[solutionNode].assignment = -1
+            self.solution[solutionNode].available[color] = color
+            self.solvedVertices = self.solvedVertices - 1
         end
+
         return self
     end,
     __index = AbstractAcceptor

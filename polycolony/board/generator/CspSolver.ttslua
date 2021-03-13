@@ -27,13 +27,12 @@ setmetatable(CspSolver, {
 
         -- Build the domain of the problem. i,e, available colors
         for node in pairs(self.underlyingGraph.getNodes()) do
-            -- print(node)
             self.solution[node] = {}
             self.solution[node].available = TableUtils.copy(self.uniqueListOfColors)
             self.solution[node].assignment = -1
         end
 
-        self.acceptor = AbstractAcceptor(self.solution, 18)
+        self.acceptor = RandomAcceptor(self.solution, 18)
 
         function self.setAcceptor(newAcceptor)
             self.acceptor = newAcceptor
@@ -67,12 +66,14 @@ setmetatable(CspSolver, {
                 if quant > 0 then
                     -- Dont check colors that are not available anymore.
                     if self.acceptor.accept() then
+                        self.availableColors[color] = self.availableColors[color] - 1
                         self.acceptor.assignSolution(nextToAssign, color, self.underlyingGraph.getNeighbors(nextToAssign))
                         local nextResult = self.solveCsp()
                         if nextResult then
                             return nextResult
                         else
                             self.acceptor.removeSolution(nextToAssign, color, nextNeighbors)
+                            self.availableColors[color] = self.availableColors[color] + 1
                         end
                     end
                 end

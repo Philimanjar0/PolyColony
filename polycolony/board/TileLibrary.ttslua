@@ -1,4 +1,4 @@
-local AssetLibrary = require('polycolony.TileAssetLibrary')
+local AssetLibrary = require('polycolony.board.TileAssetLibrary')
 local Tiles = {}
     Tiles.WHEAT = {
         name = "wheat",

@@ -7,6 +7,9 @@ local HexGraph = require('board.generator.HexGraph')
 local CspSolver = require('board.generator.CspSolver')
 local AbstractAcceptor = require('board.generator.acceptors.AbstractAcceptor')
 local RandomAcceptor = require('board.generator.acceptors.RandomAcceptor')
+local TileUtils = require('polycolony.board.TileUtils')
+local TileLibrary = require('polycolony.board.TileLibrary')
+local GraphUtils = require('polycolony.board.generator.GraphUtils')
 
 local BoardGenerator = {}
 
@@ -46,8 +49,20 @@ setmetatable(BoardGenerator, {
         self.cspSolver.solveCsp()
 
         for node, nodeTable in pairs(self.cspSolver.getSolution()) do
-            print(nodeTable.assignment)
+            -- print("Position: " .. node .. " " .. tostring(nodeTable.assignment))
+            local tempVar = TileLibrary[nodeTable.assignment]
+            if tempVar ~= nil then
+                local tileCoords = TileUtils.axialToWorld(GraphUtils.split(node, ";"), 2)
+                -- TODO the coordintates here need to be vector3. WOrld coordinates are 3 dimensional...
+                local tile = TileUtils.tileState(TileLibrary[nodeTable.assignment], tileCoords[1], tileCoords[2])
+            end
         end
+
+        --[[
+            local cardState = CardUtils.cardState(card, {0, -10, 0})
+            local cardObject = ObjectUtils.safeSpawnObject(cardState)
+            local cardInstance = CardInstance(card, cardObject)
+        ]]--
         
         
         return self
