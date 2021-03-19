@@ -5,5 +5,25 @@ local Tiles = {}
         mesh = AssetLibrary.WHEAT.MESH,
         diffuse = AssetLibrary.WHEAT.DIFFUSE,
     }
+    Tiles.ORE = {
+        name = "ore",
+        mesh = AssetLibrary.ORE.MESH,
+        diffuse = AssetLibrary.ORE.DIFFUSE,
+    }
+    Tiles.SHEEP = {
+        name = "sheep",
+        mesh = AssetLibrary.SHEEP.MESH,
+        diffuse = AssetLibrary.SHEEP.DIFFUSE,
+    }
+    Tiles.WOOD = {
+        name = "wood",
+        mesh = AssetLibrary.WOOD.MESH,
+        diffuse = AssetLibrary.WOOD.DIFFUSE,
+    }
+    Tiles.BRICK = {
+        name = "brick",
+        mesh = AssetLibrary.BRICK.MESH,
+        diffuse = AssetLibrary.BRICK.DIFFUSE,
+    }
 
 return Tiles

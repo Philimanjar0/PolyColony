@@ -1,14 +1,14 @@
 local Object = require('ge_tts.Object')
 local ObjectUtils = require('ge_tts.ObjectUtils')
 local AssetLibrary = require('polycolony.board.TileAssetLibrary')
-local Vector2 = require('ge_tts.Vector2')
+local Vector3 = require('ge_tts.Vector3')
 
 local TileUtils = {}
 
 function TileUtils.axialToWorld(axialCoords, edgeLength)
-    local qBasisVector = Vector2(math.sqrt(3)/2, 0, 3/2).scale(edgeLength)
-    local rBasisVector = Vector2(math.sqrt(3), 0, 0).scale(edgeLength)
-    return qBasisVector.scale(axialCoords[1]).add(rBasisVector.scale(axialCoords[2]))
+    local qBasisVector = Vector3(math.sqrt(3)/2, 0, 3/2).scale(edgeLength)
+    local rBasisVector = Vector3(math.sqrt(3), 0, 0).scale(edgeLength)
+    return qBasisVector.scale(axialCoords[1]).add(rBasisVector.scale(axialCoords[2])).add({0,1,0})
 end
 
 function TileUtils.tileState(tileShape, position, rotation)
@@ -19,6 +19,7 @@ function TileUtils.tileState(tileShape, position, rotation)
 
         -- Tooltip name to be displayed in game.
         Nickname = tileShape.name,
+
 
         -- Transform
         Transform = ObjectUtils.transformState({

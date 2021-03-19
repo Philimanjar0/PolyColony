@@ -10,6 +10,7 @@ local RandomAcceptor = require('board.generator.acceptors.RandomAcceptor')
 local TileUtils = require('polycolony.board.TileUtils')
 local TileLibrary = require('polycolony.board.TileLibrary')
 local GraphUtils = require('polycolony.board.generator.GraphUtils')
+local ObjectUtils = require('ge_tts.ObjectUtils')
 
 local BoardGenerator = {}
 
@@ -52,9 +53,9 @@ setmetatable(BoardGenerator, {
             -- print("Position: " .. node .. " " .. tostring(nodeTable.assignment))
             local tempVar = TileLibrary[nodeTable.assignment]
             if tempVar ~= nil then
-                local tileCoords = TileUtils.axialToWorld(GraphUtils.split(node, ";"), 2)
-                -- TODO the coordintates here need to be vector3. WOrld coordinates are 3 dimensional...
-                local tile = TileUtils.tileState(TileLibrary[nodeTable.assignment], tileCoords[1], tileCoords[2])
+                local tileCoords = TileUtils.axialToWorld(GraphUtils.split(node, ";"), 2.3)
+                local tileState = TileUtils.tileState(TileLibrary[nodeTable.assignment], tileCoords, {0,0,0})
+                local tileObject = ObjectUtils.safeSpawnObject(tileState)
             end
         end
 
