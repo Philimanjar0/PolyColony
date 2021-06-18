@@ -1,0 +1,42 @@
+local AbstractAcceptor = require('polycolony.board.generator.acceptors.AbstractAcceptor')
+local TableUtils = require('ge_tts.TableUtils')
+
+local DistributedAcceptor = {}
+
+setmetatable(DistributedAcceptor, TableUtils.merge(getmetatable(AbstractAcceptor), {
+    __call = function(_, numberOfNodes)
+
+        local self = AbstractAcceptor(numberOfNodes)
+
+        -- Assign a single solution to the solution set at a given node. Increment the respective color at its neighbors.
+        function self.assignSolution(solutionNode, color, neighbors)
+            self.solution[solutionNode].assignment = color
+            for i,neigh in pairs(neighbors) do
+                self.solution[neigh].neighboringColors[color] = self.solution[neigh].neighboringColors[color] + 1
+            end
+
+            self.solvedVertices = self.solvedVertices + 1
+        end
+
+        -- Remove a solution from the given node. Decrement the respective color at its neighbors.
+        function self.removeSolution(solutionNode, color, neighbors)
+            self.solution[solutionNode].assignment = -1
+            for i,neigh in pairs(neighbors) do
+                self.solution[neigh].neighboringColors[color] = self.solution[neigh].neighboringColors[color] - 1
+            end
+
+            self.solvedVertices = self.solvedVertices - 1
+        end
+
+        -- The acceptor method. Will return true if the the random probability threshold is met or the value of the 
+        -- respective neighboring colors is 0. This means that if placed, this tile will not share an edge with another of the same color.
+        self.accept = function(assignment, toAssign, probability)
+                return math.random() < probability or self.solution[toAssign].neighboringColors[assignment] == 0
+            end
+
+        return self
+    end,
+    __index = AbstractAcceptor,
+}))
+
+return DistributedAcceptor

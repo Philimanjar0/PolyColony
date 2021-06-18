@@ -1,0 +1,8 @@
+local PlayerPreferences = {}
+
+PlayerPreferences.BOARD = {
+    RANDOM = 0,
+    DISTRIBUTED = 1,
+}
+
+return PlayerPreferences

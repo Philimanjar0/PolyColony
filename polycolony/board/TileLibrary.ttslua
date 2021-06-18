@@ -25,5 +25,10 @@ local Tiles = {}
         mesh = AssetLibrary.BRICK.MESH,
         diffuse = AssetLibrary.BRICK.DIFFUSE,
     }
+    Tiles.DESERT = {
+        name = "desert",
+        mesh = AssetLibrary.DESERT.MESH,
+        diffuse = AssetLibrary.DESERT.DIFFUSE,
+    }
 
 return Tiles

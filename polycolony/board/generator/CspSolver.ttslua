@@ -5,34 +5,43 @@ local TableUtils = require('ge_tts.TableUtils')
 local CspSolver = {}
 
 setmetatable(CspSolver, {
-    __call = function(_, underlyingGraph, availableColors)
+    __call = function(_, underlyingGraph, availableColors, acceptor)
         
         local self = {}
 
+        -- The underlying graph object
         self.underlyingGraph = underlyingGraph
         
-        self.availableColors = availableColors
+        -- Colors and their cooresponding remaining quantities.
+        self.availableColors = TableUtils.copy(availableColors)
 
-        -- This is just a raw list of colors to use as a domain. Each vertex will have this list as colors 
-        -- that can be assigned without violating the constraints.
+        -- The acceptor object. This decides if a tile can be assigned at a specific location. This holds the constraint information
+        -- TODO When simplifying the code, multiple classes are probably not needed anymore. Remove and reduce complexity.
+        self.acceptor = acceptor
 
-        self.uniqueListOfColors = {}
-        
+        -- This is just a raw list of colors to use as a domain. Each vertex on the solution graph maintains a list of how 
+        -- many of each color it is neighboring.
+        self.neighboringColors = {}
         for color, quant in pairs(availableColors) do
-            self.uniqueListOfColors[color] = color
+            self.neighboringColors[color] = 0
         end
 
-        -- Table relating node tuples to a list of colors
+
+        -- The table that contains the solution of the board generation. Relates coordinates of tiles to colors.
         self.solution = {}
 
-        -- Build the domain of the problem. i,e, available colors
+        -- Pass the reference of the solution to the acceptor.
+        self.acceptor.setSolution(self.solution, 0)
+
+        -- Build the domain of the problem. Each node contains
+        --      neighboringColors: The list of colors and cooresponding quantities of neighboring tiles.
+        --      assignment: The color assigned to this node. Unassigned is -1.
         for node in pairs(self.underlyingGraph.getNodes()) do
             self.solution[node] = {}
-            self.solution[node].available = TableUtils.copy(self.uniqueListOfColors)
+            self.solution[node].neighboringColors = TableUtils.copy(self.neighboringColors)
             self.solution[node].assignment = -1
         end
 
-        self.acceptor = RandomAcceptor(self.solution, 18)
 
         function self.setAcceptor(newAcceptor)
             self.acceptor = newAcceptor
@@ -46,6 +55,7 @@ setmetatable(CspSolver, {
             return self.solution
         end
 
+        -- Helper function to get the next unassigned node.
         local function getNext()
             for node,table in pairs(self.solution) do
                 if table.assignment == -1 then
@@ -55,23 +65,30 @@ setmetatable(CspSolver, {
             return nil
         end
 
+        -- The constraint satisfaction solver. It recursively 
         function self.solveCsp()
             if self.acceptor.areAllSolved() then
+                -- Terminal condition. Return the solved board.
                 return self.solution
             end
             local nextToAssign = getNext()
             local nextNeighbors = self.underlyingGraph.getNeighbors(nextToAssign)
-            --TODO if performance is bad, do better ordering than just the default.
+            -- TODO if performance is bad, do better ordering than just the default.
+            -- TODO shuffle the starting order each time this loop is called. Will affect performance but improve game variety
             for color, quant in pairs(self.availableColors) do
                 if quant > 0 then
                     -- Dont check colors that are not available anymore.
-                    if self.acceptor.accept() then
+                    -- TODO get the randomness value below passed to accept() from the board generator which may have bigger consequences
+                    if self.acceptor.accept(color, nextToAssign, 0) then
                         self.availableColors[color] = self.availableColors[color] - 1
                         self.acceptor.assignSolution(nextToAssign, color, self.underlyingGraph.getNeighbors(nextToAssign))
+                        -- TODO possible abstract assigning and remove solutions to the solver not acceptor
                         local nextResult = self.solveCsp()
                         if nextResult then
+                            -- If the next assignment is possible, return it.
                             return nextResult
                         else
+                            -- If there is no possible assignment for the next tile. Remove the cuurrent tried solution.
                             self.acceptor.removeSolution(nextToAssign, color, nextNeighbors)
                             self.availableColors[color] = self.availableColors[color] + 1
                         end

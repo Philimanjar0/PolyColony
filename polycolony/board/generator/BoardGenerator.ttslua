@@ -7,64 +7,78 @@ local HexGraph = require('board.generator.HexGraph')
 local CspSolver = require('board.generator.CspSolver')
 local AbstractAcceptor = require('board.generator.acceptors.AbstractAcceptor')
 local RandomAcceptor = require('board.generator.acceptors.RandomAcceptor')
+local DistributedAcceptor = require('board.generator.acceptors.DistributedAcceptor')
 local TileUtils = require('polycolony.board.TileUtils')
 local TileLibrary = require('polycolony.board.TileLibrary')
 local GraphUtils = require('polycolony.board.generator.GraphUtils')
 local ObjectUtils = require('ge_tts.ObjectUtils')
+local UserPreferences = require('polycolony.UserPreferences')
+local TableUtils = require('ge_tts.TableUtils')
 
 local BoardGenerator = {}
 
 setmetatable(BoardGenerator, {
-    __call = function(_, boardConfig, edgeLength)
+    __call = function(_, boardConfig, edgeLength, boardType)
         local self = {}
 
         -- Create and populate the HexGraph
         self.hexGraph = HexGraph()
 
         -- Hex coordinates for the desert to remove that node from the graph. It should not get colored so it should not be in the domain.
+        -- Coordinates calculated from https://www.redblobgames.com/grids/hexagons/#range
+        local desertX = math.random(boardConfig.SIZE.X[1], boardConfig.SIZE.X[2])
+        local desertY = math.random(math.max(boardConfig.SIZE.Y[1], -desertX - boardConfig.SIZE.Y[2]), 
+                                    math.min(boardConfig.SIZE.Y[2], -desertX + boardConfig.SIZE.Y[2]))
         local desertCoords = {
-            x = math.random(boardConfig.SIZE.X[1], boardConfig.SIZE.X[2]),
-            y = math.random(boardConfig.SIZE.X[1], boardConfig.SIZE.Y[2]),
-            z = math.random(boardConfig.SIZE.Z[1], boardConfig.SIZE.Z[2])
+            -- The z coordinate is generated based on the x+y+z=0 constraint used for the coordinate system.
+            x = desertX,
+            z = -desertX - desertY
         }
-
-        -- We do waste a bit of looping to get all the tiles because for each z loop, only one value satisfies the x+y+z=0 constraint.
-        -- Not sure how else to do non-symmetric boards right now, who cares though it runs once.
-        --TODO make this loop more efficient. calculate one of the values from the other 3
+        
+        -- Generate the underlying graph used for CSP solving.
+        -- Coordinates calculated from https://www.redblobgames.com/grids/hexagons/#range
         for x = boardConfig.SIZE.X[1], boardConfig.SIZE.X[2] do
-            for y = boardConfig.SIZE.X[1], boardConfig.SIZE.Y[2] do
-                for z = boardConfig.SIZE.Z[1], boardConfig.SIZE.Z[2] do
-                    if x + y + z == 0 then
-                        -- add all the nodes to the underlying graph that fit the layout defined in BoardConfig
-                        self.hexGraph.addNode(x, z)
-                    end
-                end
+            for y = math.max(boardConfig.SIZE.Y[1], -x - boardConfig.SIZE.Y[2]), 
+            math.min(boardConfig.SIZE.Y[2], -x + boardConfig.SIZE.Y[2]) do
+                -- The z coordinate is generated based on the x+y+z=0 constraint used for the coordinate system.
+                local z = -x - y
+                self.hexGraph.addNode(x, z)
             end
         end
 
         -- Remove the desert node from the graph to speed up generation.
         self.hexGraph.removeNode(desertCoords.x, desertCoords.z)
-        
-        -- Build the CSP solver for resources
-        self.cspSolver = CspSolver(self.hexGraph, boardConfig.RESOURCES)
-        self.cspSolver.solveCsp()
 
-        for node, nodeTable in pairs(self.cspSolver.getSolution()) do
-            -- print("Position: " .. node .. " " .. tostring(nodeTable.assignment))
-            local tempVar = TileLibrary[nodeTable.assignment]
-            if tempVar ~= nil then
-                local tileCoords = TileUtils.axialToWorld(GraphUtils.split(node, ";"), 2.3)
-                local tileState = TileUtils.tileState(TileLibrary[nodeTable.assignment], tileCoords, {0,0,0})
-                local tileObject = ObjectUtils.safeSpawnObject(tileState)
-            end
+        -- Calcuate the total number of resource to be allocated on the board. Used by the solver to learn if it is done.
+        local totalResourceTiles = 0
+        for _,val in pairs(boardConfig.RESOURCES) do
+            totalResourceTiles = totalResourceTiles + val
         end
 
-        --[[
-            local cardState = CardUtils.cardState(card, {0, -10, 0})
-            local cardObject = ObjectUtils.safeSpawnObject(cardState)
-            local cardInstance = CardInstance(card, cardObject)
-        ]]--
-        
+        -- Build the CSP solver for resources.
+        -- See the TODO in the CspSolver class to remove these.
+        local acceptor = nil
+        if boardType == UserPreferences.BOARD.RANDOM then
+            acceptor = RandomAcceptor(totalResourceTiles)
+        elseif boardType == UserPreferences.BOARD.DISTRIBUTED then
+            acceptor = DistributedAcceptor(totalResourceTiles)
+        end
+
+        -- Generate the board by solving the CSP.
+        self.cspSolver = CspSolver(self.hexGraph, boardConfig.RESOURCES, acceptor)
+        self.cspSolver.solveCsp()
+
+        -- Spawn in the respective tiles in game based on the solution.
+        for node, nodeTable in pairs(self.cspSolver.getSolution()) do
+            local tileCoords = TileUtils.axialToWorld(GraphUtils.split(node, ";"), 2.3)
+            local tileState = TileUtils.tileState(TileLibrary[nodeTable.assignment], tileCoords, {0,0,0})
+            local tileObject = ObjectUtils.safeSpawnObject(tileState)
+        end
+
+        -- Spawn in the desert tile.
+        ObjectUtils.safeSpawnObject(
+            TileUtils.tileState(
+                TileLibrary.DESERT, TileUtils.axialToWorld({desertCoords.x, desertCoords.z}, 2.3), {0,0,0}))        
         
         return self
     end,

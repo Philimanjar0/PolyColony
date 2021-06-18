@@ -8,10 +8,10 @@ BoardConfig.SMALL = {
     },
     RESOURCES = {
         SHEEP = 4,
-        ORE = 3,
-        BRICK = 3,
+        WOOD = 4,
         WHEAT = 4,
-        WOOD = 4
+        BRICK = 3,
+        ORE = 3,
     }
 }
 

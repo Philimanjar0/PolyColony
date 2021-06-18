@@ -39,7 +39,7 @@ setmetatable(HexGraph, {
                     end
                 end
             end
-            self.nodes[{q,r}] = nil
+            self.nodes[GraphUtils.getKeyForNode(q,r)] = nil
         end
 
         -- Get actual neighbors of given node.
@@ -47,7 +47,11 @@ setmetatable(HexGraph, {
         -- @param r The r value of the given node in axial hex coordinates.
         -- @return list of neighbors. Returns as a list of a list of keys in the form of strings returned by GraphUtils.getKeyForNode.
         function self.getNeighbors(node)
-            return self.nodes[node]
+            local returnTable = {}
+            for _,neighbor in pairs(self.nodes[node]) do
+                table.insert(returnTable, GraphUtils.getKeyForNode(neighbor[1], neighbor[2]))
+            end
+            return returnTable
         end
 
         -- Get all nodes in the graph.

@@ -20,6 +20,8 @@ local CardDropZone = require('polycolony.cards.CardDropZone')
 local BoardGenerator = require('polycolony.board.generator.BoardGenerator')
 local BoardConfig = require('polycolony.board.BoardConfig')
 
+-- User Preferences from UI
+local UserPreferences = require('polycolony.UserPreferences')
 
 -- Table to keep track of instances and zones
 ---@type CardInstance[]
@@ -38,7 +40,7 @@ local function onLoad(state)
     
             -- Build all the card related components including drop zones
             --CardComponents(WorldLayout.SMALL)
-            local boardGenerator = BoardGenerator(BoardConfig.SMALL, 2)
+            local boardGenerator = BoardGenerator(BoardConfig.SMALL, 2, UserPreferences.BOARD.DISTRIBUTED)
 
         else
             --We need to restore the save game.
