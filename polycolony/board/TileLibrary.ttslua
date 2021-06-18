@@ -30,5 +30,10 @@ local Tiles = {}
         mesh = AssetLibrary.DESERT.MESH,
         diffuse = AssetLibrary.DESERT.DIFFUSE,
     }
+    Tiles.OCEAN = {
+        name = "ocean",
+        mesh = AssetLibrary.OCEAN.MESH,
+        diffuse = AssetLibrary.OCEAN.DIFFUSE,
+    }
 
 return Tiles

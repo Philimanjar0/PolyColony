@@ -27,7 +27,7 @@ local TileAssetLibrary = {
     },
     OCEAN = {
         MESH = "E:/PolyColony/out/tiles/ocean/ocean.obj",
-        DIFFUSE = "E:/PolyColony/out/tiles/ocean.png",
+        DIFFUSE = "E:/PolyColony/out/tiles/ocean/ocean.png",
     }
 }
 

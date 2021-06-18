@@ -1,11 +1,10 @@
-local AbstractAcceptor = require('polycolony.board.generator.acceptors.AbstractAcceptor')
-local RandomAcceptor = require('polycolony.board.generator.acceptors.RandomAcceptor')
+local DistributedAcceptor = require('board.generator.acceptors.DistributedAcceptor')
 local TableUtils = require('ge_tts.TableUtils')
 
 local CspSolver = {}
 
 setmetatable(CspSolver, {
-    __call = function(_, underlyingGraph, availableColors, acceptor)
+    __call = function(_, underlyingGraph, availableColors, randomnessThreshold, totalVertices)
         
         local self = {}
 
@@ -16,8 +15,11 @@ setmetatable(CspSolver, {
         self.availableColors = TableUtils.copy(availableColors)
 
         -- The acceptor object. This decides if a tile can be assigned at a specific location. This holds the constraint information
-        -- TODO When simplifying the code, multiple classes are probably not needed anymore. Remove and reduce complexity.
-        self.acceptor = acceptor
+        self.acceptor = DistributedAcceptor(totalVertices)
+
+        -- The threshold randomness used when chosing if tiles can be placed the board. 
+        -- Higher randomness threshold means less random and more evenly distributed tiles.
+        self.randomnessThreshold = randomnessThreshold
 
         -- This is just a raw list of colors to use as a domain. Each vertex on the solution graph maintains a list of how 
         -- many of each color it is neighboring.
@@ -78,11 +80,9 @@ setmetatable(CspSolver, {
             for color, quant in pairs(self.availableColors) do
                 if quant > 0 then
                     -- Dont check colors that are not available anymore.
-                    -- TODO get the randomness value below passed to accept() from the board generator which may have bigger consequences
-                    if self.acceptor.accept(color, nextToAssign, 0) then
+                    if self.acceptor.accept(color, nextToAssign, self.randomnessThreshold) then
                         self.availableColors[color] = self.availableColors[color] - 1
                         self.acceptor.assignSolution(nextToAssign, color, self.underlyingGraph.getNeighbors(nextToAssign))
-                        -- TODO possible abstract assigning and remove solutions to the solver not acceptor
                         local nextResult = self.solveCsp()
                         if nextResult then
                             -- If the next assignment is possible, return it.

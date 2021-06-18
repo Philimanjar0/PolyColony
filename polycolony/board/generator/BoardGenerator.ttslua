@@ -1,13 +1,7 @@
 -- Coordinate system conventions from https://www.redblobgames.com/grids/hexagons/
 
--- q = x and r = z
-
-local Vector3 = require('ge_tts.Vector3')
 local HexGraph = require('board.generator.HexGraph')
 local CspSolver = require('board.generator.CspSolver')
-local AbstractAcceptor = require('board.generator.acceptors.AbstractAcceptor')
-local RandomAcceptor = require('board.generator.acceptors.RandomAcceptor')
-local DistributedAcceptor = require('board.generator.acceptors.DistributedAcceptor')
 local TileUtils = require('polycolony.board.TileUtils')
 local TileLibrary = require('polycolony.board.TileLibrary')
 local GraphUtils = require('polycolony.board.generator.GraphUtils')
@@ -54,31 +48,33 @@ setmetatable(BoardGenerator, {
         for _,val in pairs(boardConfig.RESOURCES) do
             totalResourceTiles = totalResourceTiles + val
         end
-
-        -- Build the CSP solver for resources.
-        -- See the TODO in the CspSolver class to remove these.
-        local acceptor = nil
-        if boardType == UserPreferences.BOARD.RANDOM then
-            acceptor = RandomAcceptor(totalResourceTiles)
-        elseif boardType == UserPreferences.BOARD.DISTRIBUTED then
-            acceptor = DistributedAcceptor(totalResourceTiles)
-        end
-
+        
         -- Generate the board by solving the CSP.
-        self.cspSolver = CspSolver(self.hexGraph, boardConfig.RESOURCES, acceptor)
+        self.cspSolver = CspSolver(self.hexGraph, boardConfig.RESOURCES, UserPreferences.BOARD_RANDOMNESS, totalResourceTiles)
         self.cspSolver.solveCsp()
 
-        -- Spawn in the respective tiles in game based on the solution.
+        -- Spawn in the respective tiles in game based on the solution. 
         for node, nodeTable in pairs(self.cspSolver.getSolution()) do
             local tileCoords = TileUtils.axialToWorld(GraphUtils.split(node, ";"), 2.3)
-            local tileState = TileUtils.tileState(TileLibrary[nodeTable.assignment], tileCoords, {0,0,0})
+            local tileState = TileUtils.tileState(TileLibrary[nodeTable.assignment], tileCoords, {0, math.random(0,5) * 60, 0})
             local tileObject = ObjectUtils.safeSpawnObject(tileState)
         end
 
         -- Spawn in the desert tile.
         ObjectUtils.safeSpawnObject(
             TileUtils.tileState(
-                TileLibrary.DESERT, TileUtils.axialToWorld({desertCoords.x, desertCoords.z}, 2.3), {0,0,0}))        
+                TileLibrary.DESERT, TileUtils.axialToWorld({desertCoords.x, desertCoords.z}, 2.3), {0,0,0}))
+
+        -- Build the ocean boarder. Loop logic from https://www.redblobgames.com/grids/hexagons/#rings
+        local oceanCoords = {boardConfig.SIZE.X[1] - 1, boardConfig.SIZE.Y[2] - 2}
+        for i = 1,6 do
+            for j = 0,2 do
+                ObjectUtils.safeSpawnObject(
+                    TileUtils.tileState(
+                        TileLibrary.OCEAN, TileUtils.axialToWorld(oceanCoords, 2.3), {0, math.random(0,5) * 60, 0}))
+                oceanCoords = GraphUtils.getAllNeighbors(oceanCoords[1], oceanCoords[2])[i]
+            end
+        end
         
         return self
     end,
