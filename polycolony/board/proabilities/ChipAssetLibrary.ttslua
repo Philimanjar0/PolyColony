@@ -1,0 +1,36 @@
+local path = 'E:/PolyColony/out/tokenFaces/probCoins/'
+
+local ChipAssetLibrary = {
+    TWO = {
+        IMAGE = path .. 'two.png'
+    },
+    THREE = {
+        IMAGE = path .. 'three.png'
+    },
+    FOUR = {
+        IMAGE = path .. 'four.png'
+    },
+    FIVE = {
+        IMAGE = path .. 'five.png'
+    },
+    SIX = {
+        IMAGE = path .. 'six.png'
+    },
+    EIGHT = {
+        IMAGE = path .. 'eight.png'
+    },
+    NINE = {
+        IMAGE = path .. 'nine.png'
+    },
+    TEN = {
+        IMAGE = path .. 'ten.png'
+    },
+    ELEVEN = {
+        IMAGE = path .. 'eleven.png'
+    },
+    TWELVE = {
+        IMAGE = path .. 'twelve.png'
+    },
+}
+
+return ChipAssetLibrary

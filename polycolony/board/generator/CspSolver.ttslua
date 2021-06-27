@@ -1,10 +1,12 @@
 local DistributedAcceptor = require('board.generator.acceptors.DistributedAcceptor')
 local TableUtils = require('ge_tts.TableUtils')
+local Solution = require('board.generator.solutions.Solution')
 
 local CspSolver = {}
 
 setmetatable(CspSolver, {
-    __call = function(_, underlyingGraph, availableColors, randomnessThreshold, totalVertices)
+    -- __call = function(_, underlyingGraph, availableColors, randomnessThreshold, totalVertices)
+    __call = function(_, solution, acceptor, availableColors, underlyingGraph)
         
         local self = {}
 
@@ -15,35 +17,15 @@ setmetatable(CspSolver, {
         self.availableColors = TableUtils.copy(availableColors)
 
         -- The acceptor object. This decides if a tile can be assigned at a specific location. This holds the constraint information
-        self.acceptor = DistributedAcceptor(totalVertices)
-
-        -- The threshold randomness used when chosing if tiles can be placed the board. 
-        -- Higher randomness threshold means less random and more evenly distributed tiles.
-        self.randomnessThreshold = randomnessThreshold
-
-        -- This is just a raw list of colors to use as a domain. Each vertex on the solution graph maintains a list of how 
-        -- many of each color it is neighboring.
-        self.neighboringColors = {}
-        for color, quant in pairs(availableColors) do
-            self.neighboringColors[color] = 0
-        end
-
+        self.acceptor = acceptor
 
         -- The table that contains the solution of the board generation. Relates coordinates of tiles to colors.
-        self.solution = {}
+        -- self.solution = Solution(self.underlyingGraph, self.availableColors)
+
+        self.solution = solution
 
         -- Pass the reference of the solution to the acceptor.
         self.acceptor.setSolution(self.solution, 0)
-
-        -- Build the domain of the problem. Each node contains
-        --      neighboringColors: The list of colors and cooresponding quantities of neighboring tiles.
-        --      assignment: The color assigned to this node. Unassigned is -1.
-        for node in pairs(self.underlyingGraph.getNodes()) do
-            self.solution[node] = {}
-            self.solution[node].neighboringColors = TableUtils.copy(self.neighboringColors)
-            self.solution[node].assignment = -1
-        end
-
 
         function self.setAcceptor(newAcceptor)
             self.acceptor = newAcceptor
@@ -54,12 +36,12 @@ setmetatable(CspSolver, {
         end
 
         function self.getSolution()
-            return self.solution
+            return self.solution.solutionNodes
         end
 
         -- Helper function to get the next unassigned node.
         local function getNext()
-            for node,table in pairs(self.solution) do
+            for node,table in pairs(self.solution.getSolution()) do
                 if table.assignment == -1 then
                     return node
                 end
@@ -80,7 +62,7 @@ setmetatable(CspSolver, {
             for color, quant in pairs(self.availableColors) do
                 if quant > 0 then
                     -- Dont check colors that are not available anymore.
-                    if self.acceptor.accept(color, nextToAssign, self.randomnessThreshold) then
+                    if self.acceptor.accept(color, nextToAssign) then
                         self.availableColors[color] = self.availableColors[color] - 1
                         self.acceptor.assignSolution(nextToAssign, color, self.underlyingGraph.getNeighbors(nextToAssign))
                         local nextResult = self.solveCsp()

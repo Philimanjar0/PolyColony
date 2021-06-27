@@ -1,0 +1,31 @@
+local TableUtils = require('ge_tts.TableUtils')
+
+local ResourceSolution = {}
+
+setmetatable(ResourceSolution, {
+    __call = function(_, graph, availableColors)
+        local self = {}
+        self.solution = {}
+        self.neighboringColors = {}
+
+        for color, quant in pairs(availableColors) do
+            self.neighboringColors[color] = 0
+        end
+        for node in pairs(graph.getNodes()) do
+            self.solution[node] = {}
+            self.solution[node].neighboringColors = TableUtils.copy(self.neighboringColors)
+            self.solution[node].assignment = -1
+        end
+
+        function self.getSolution()
+            return self.solution
+        end
+
+        function self.setSolution(newSolution)
+            self.solution = newSolution
+        end
+        return self
+    end,
+})
+
+return ResourceSolution

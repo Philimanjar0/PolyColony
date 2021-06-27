@@ -17,7 +17,7 @@ local WorldLayout = require('polycolony.WorldLayout')
 local CardDropZone = require('polycolony.cards.CardDropZone')
 
 -- Board Stuff
-local BoardGenerator = require('polycolony.board.generator.BoardGenerator')
+local BoardGenerator = require('board.generator.BoardGenerator')
 local BoardConfig = require('polycolony.board.BoardConfig')
 
 -- User Preferences from UI

@@ -1,13 +1,18 @@
--- Coordinate system conventions from https://www.redblobgames.com/grids/hexagons/
+-- -- Coordinate system conventions from https://www.redblobgames.com/grids/hexagons/
 
-local HexGraph = require('board.generator.HexGraph')
+local HexGraph = require('board.graph.HexGraph')
 local CspSolver = require('board.generator.CspSolver')
-local TileUtils = require('polycolony.board.TileUtils')
-local TileLibrary = require('polycolony.board.TileLibrary')
-local GraphUtils = require('polycolony.board.generator.GraphUtils')
+local TileUtils = require('polycolony.board.tiles.TileUtils')
+local TileLibrary = require('polycolony.board.tiles.TileLibrary')
+local GraphUtils = require('polycolony.board.graph.GraphUtils')
 local ObjectUtils = require('ge_tts.ObjectUtils')
 local UserPreferences = require('polycolony.UserPreferences')
 local TableUtils = require('ge_tts.TableUtils')
+local ChipLibrary = require('board.proabilities.ChipAssetLibrary')
+local DistributedAcceptor = require('board.generator.acceptors.DistributedAcceptor')
+local ProbabilityAcceptor = require('board.generator.acceptors.ProbabilityAcceptor')
+local Solution = require('board.generator.solutions.Solution')
+local ProbabilitySolution = require('board.generator.solutions.ProbabilitySolution')
 
 local BoardGenerator = {}
 
@@ -48,13 +53,18 @@ setmetatable(BoardGenerator, {
         for _,val in pairs(boardConfig.RESOURCES) do
             totalResourceTiles = totalResourceTiles + val
         end
-        
+
+        -- DistributedAcceptor(totalResourceTiles, UserPreferences.BOARD_RANDOMNESS)
+
+        -- Solution(self.hexGraph, boardConfig.RESOURCES)
         -- Generate the board by solving the CSP.
-        self.cspSolver = CspSolver(self.hexGraph, boardConfig.RESOURCES, UserPreferences.BOARD_RANDOMNESS, totalResourceTiles)
-        self.cspSolver.solveCsp()
+        
+        self.resourceSolver = CspSolver(Solution(self.hexGraph, boardConfig.RESOURCES), 
+            DistributedAcceptor(totalResourceTiles, UserPreferences.BOARD_RANDOMNESS), boardConfig.RESOURCES, self.hexGraph)
+        self.resourceSolver.solveCsp()
 
         -- Spawn in the respective tiles in game based on the solution. 
-        for node, nodeTable in pairs(self.cspSolver.getSolution()) do
+        for node, nodeTable in pairs(self.resourceSolver.getSolution()) do
             local tileCoords = TileUtils.axialToWorld(GraphUtils.split(node, ";"), 2.3)
             local tileState = TileUtils.tileState(TileLibrary[nodeTable.assignment], tileCoords, {0, math.random(0,5) * 60, 0})
             local tileObject = ObjectUtils.safeSpawnObject(tileState)
@@ -75,7 +85,25 @@ setmetatable(BoardGenerator, {
                 oceanCoords = GraphUtils.getAllNeighbors(oceanCoords[1], oceanCoords[2])[i]
             end
         end
-        
+
+        -- ProbabilitySolution(self.hexGraph, boardConfig.PROBABILITIES, self.resourceSolver.getSolution())
+
+        -- print(TableUtils.dump(self.resourceSolver.getSolution(), true))
+        self.probabilitySolver = CspSolver(ProbabilitySolution(self.hexGraph, boardConfig.PROBABILITIES, self.resourceSolver.getSolution()), 
+            ProbabilityAcceptor(totalResourceTiles, UserPreferences.BOARD_RANDOMNESS, 13, 10), boardConfig.PROBABILITIES, self.hexGraph)
+        self.probabilitySolver.solveCsp()
+
+        -- -- print(TableUtils.dump(self.probabilitySolver.getSolution(), true))
+
+        for prob, nodeTable in pairs(self.probabilitySolver.getSolution()) do
+            local chipCoords = TileUtils.axialToWorld(GraphUtils.split(prob, ";"), 2.3)
+            -- print(chipCoords)
+            -- print(TableUtils.dump(ChipLibrary[nodeTable.assignment]))
+            local chipState = TileUtils.chipState(ChipLibrary[nodeTable.assignment], chipCoords, {0, 0, 0})
+            local chipObject = ObjectUtils.safeSpawnObject(chipState)
+        end
+
+        -- ObjectUtils.safeSpawnObject(TileUtils.chipState(ChipLibrary.TWO, {0,5,0}, {0,0,0}))
         return self
     end,
 })

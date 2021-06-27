@@ -1,0 +1,32 @@
+local TableUtils = require('ge_tts.TableUtils')
+local Solution = require('board.generator.solutions.Solution')
+
+local ProbabilitySolution = {}
+
+
+
+setmetatable(ProbabilitySolution, TableUtils.merge(getmetatable(Solution), {
+    __call = function(_, graph, availableColors, resourceSolutionNodes)
+
+        local self = Solution(graph, availableColors)
+
+        self.totalPipPerColor = {}
+        self.resourceSolutionNodes = resourceSolutionNodes
+        
+        -- for color, _ in pairs(availableColors) do
+        --     self.totalPipPerColor[color] = 0
+        -- end
+
+        self.totalPipPerColor.BRICK = 0
+        self.totalPipPerColor.ORE = 0
+        self.totalPipPerColor.WHEAT = 0
+        self.totalPipPerColor.SHEEP = 0
+        self.totalPipPerColor.WOOD = 0
+
+        return self
+    end,
+
+    __index = Solution,
+}))
+
+return ProbabilitySolution

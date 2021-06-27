@@ -1,0 +1,5 @@
+local AssetLibrary = require('polycolony.board.tiles.TileAssetLibrary')
+
+local Chip = {}
+
+return Chip

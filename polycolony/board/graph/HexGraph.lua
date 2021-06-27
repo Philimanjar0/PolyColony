@@ -1,4 +1,4 @@
-local GraphUtils = require('board.generator.GraphUtils')
+local GraphUtils = require('board.graph.GraphUtils')
 
 local HexGraph = {}
 

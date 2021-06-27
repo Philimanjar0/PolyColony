@@ -1,6 +1,6 @@
 local Object = require('ge_tts.Object')
 local ObjectUtils = require('ge_tts.ObjectUtils')
-local AssetLibrary = require('polycolony.board.TileAssetLibrary')
+local AssetLibrary = require('polycolony.board.tiles.TileAssetLibrary')
 local Vector3 = require('ge_tts.Vector3')
 
 local TileUtils = {}
@@ -41,6 +41,32 @@ function TileUtils.tileState(tileShape, position, rotation)
             --TODO custom shader for tiles at some point if they look bad.
         }
     }
+end
+
+function TileUtils.chipState(chip, position, rotation)
+
+return {
+    Name = Object.Name.Tile,
+
+    Nickname = "test",
+
+    Transform = ObjectUtils.transformState({
+        position = {position[1], 5, position[3]},
+        rotation = rotation,
+        scale = {0.48,1,0.48},
+    }),
+
+    Locked = true,
+ 
+    CustomImage = {
+        ImageURL = chip.IMAGE,
+        SecondaryImageURL = chip.IMAGE,
+        CustomTile = {
+            Type = 2,
+            Thickness = 0.05
+        }
+    }
+}
 end
 
 return TileUtils

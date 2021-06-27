@@ -12,6 +12,18 @@ BoardConfig.SMALL = {
         WHEAT = 4,
         BRICK = 3,
         ORE = 3,
+    },
+    PROBABILITIES = {
+        TWO = 1,
+        THREE = 2,
+        FOUR = 2,
+        FIVE = 2,
+        SIX = 2,
+        EIGHT = 2,
+        NINE = 2,
+        TEN = 2,
+        ELEVEN = 2,
+        TWELVE = 1
     }
 }
 

@@ -1,0 +1,80 @@
+local DistributedAcceptor = require('polycolony.board.generator.acceptors.DistributedAcceptor')
+local TableUtils = require('ge_tts.TableUtils')
+local Solution = require('board.generator.solutions.Solution')
+
+local resourceToPip = {}
+    resourceToPip.TWO = 1
+    resourceToPip.THREE = 2
+    resourceToPip.FOUR = 3
+    resourceToPip.FIVE = 4
+    resourceToPip.SIX = 5
+
+    resourceToPip.EIGHT = 5
+    resourceToPip.NINE = 4
+    resourceToPip.TEN = 3
+    resourceToPip.ELEVEN = 2
+    resourceToPip.TWELVE = 1
+
+local ProbabilityAcceptor = {}
+
+setmetatable(ProbabilityAcceptor, TableUtils.merge(getmetatable(DistributedAcceptor), {
+    -- __call = function(_, numberOfNodes, smallReturnThreshold, largeReturnThreshold)
+    __call = function(_, numberOfNodes, randomnessThreshold, largeReturnThreshold, smallReturnThreshold)
+
+        local self = DistributedAcceptor(numberOfNodes, randomnessThreshold)
+
+        -- self.smallReturnThreshold = smallReturnThreshold
+
+        -- self.largeReturnThreshold = largeReturnThreshold
+
+        self.upperOrLowerThreshold = {}
+        self.upperOrLowerThreshold.SHEEP = largeReturnThreshold
+        self.upperOrLowerThreshold.WOOD = largeReturnThreshold
+        self.upperOrLowerThreshold.BRICK = smallReturnThreshold
+        self.upperOrLowerThreshold.ORE = smallReturnThreshold
+        self.upperOrLowerThreshold.WHEAT = largeReturnThreshold
+
+        -- Assign a single solution to the solution set at a given node. Increment the respective color at its neighbors.
+        function self.assignSolution(solutionNode, color, neighbors)
+            self.solution.solutionNodes[solutionNode].assignment = color
+            for i,neigh in pairs(neighbors) do
+                self.solution.solutionNodes[neigh].neighboringColors[color] = self.solution.solutionNodes[neigh].neighboringColors[color] + 1
+            end
+            self.solution.totalPipPerColor[self.solution.resourceSolutionNodes[solutionNode].assignment] 
+                = self.solution.totalPipPerColor[self.solution.resourceSolutionNodes[solutionNode].assignment] + resourceToPip[color]
+            self.solvedVertices = self.solvedVertices + 1
+        end
+
+        -- Remove a solution from the given node. Decrement the respective color at its neighbors.
+        function self.removeSolution(solutionNode, color, neighbors)
+            self.solution.solutionNodes[solutionNode].assignment = -1
+            for i,neigh in pairs(neighbors) do
+                self.solution.solutionNodes[neigh].neighboringColors[color] = self.solution.solutionNodes[neigh].neighboringColors[color] - 1
+            end
+            self.solution.totalPipPerColor[self.solution.resourceSolutionNodes[solutionNode].assignment] 
+            = self.solution.totalPipPerColor[self.solution.resourceSolutionNodes[solutionNode].assignment] - resourceToPip[color]
+            self.solvedVertices = self.solvedVertices - 1
+        end
+
+
+        -- Acceptance criterea in order of implementation priority
+        --    1. Correct expected payout per resource type (within a margin)
+        --       a. 12.889 per 4 tile resources (wheat, sheep, wood)
+        --       b. 9.667 per 3 tile resources (brick, ore)
+        --       c. Could probably solve this with alpha-beta pruning?
+        --    2. No number clustering
+        --    3. Only one 6 or 8 per resource type (not yet implemented)
+        self.accept = function(assignment, toAssign, probability)
+            -- local test = self.solution.totalPipPerColor[self.solution.resourceSolutionNodes[toAssign].assignment] -- total pips per resource
+            -- print(self.solution.solutionNodes[toAssign].neighboringColors[assignment])
+            return self.solution.solutionNodes[toAssign].neighboringColors[assignment] == 0 
+            and self.solution.totalPipPerColor[self.solution.resourceSolutionNodes[toAssign].assignment] + resourceToPip[assignment] 
+                <= self.upperOrLowerThreshold[self.solution.resourceSolutionNodes[toAssign].assignment]
+            -- return 1
+        end
+        return self
+    end,
+    __index = DistributedAcceptor
+}))
+
+return ProbabilityAcceptor
